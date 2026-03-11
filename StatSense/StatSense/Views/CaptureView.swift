@@ -1,9 +1,11 @@
 import SwiftUI
 import PhotosUI
+import SwiftData
 
 struct CaptureView: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     @EnvironmentObject var graphAnalyzer: GraphAnalyzer
+    @Environment(\.modelContext) private var modelContext
     @StateObject private var cameraService = CameraService()
     
     @State private var showingImagePicker = false
@@ -150,7 +152,17 @@ struct CaptureView: View {
     
     private func analyzeImage(_ image: UIImage) {
         Task {
-            if let _ = await graphAnalyzer.analyzeImage(image) {
+            if let result = await graphAnalyzer.analyzeImage(image) {
+                // Save to History using SwiftData
+                if let compressedData = image.jpegData(compressionQuality: 0.8) {
+                    do {
+                        let savedGraph = try SavedGraph(imageData: compressedData, interpretationResult: result)
+                        modelContext.insert(savedGraph)
+                    } catch {
+                        print("Failed to save graph to history: \(error)")
+                    }
+                }
+                
                 showingResults = true
                 accessibilityManager.playHaptic(.success)
                 

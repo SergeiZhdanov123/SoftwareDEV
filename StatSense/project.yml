@@ -17,10 +17,17 @@ targets:
   StatSense:
     type: application
     platform: iOS
+    configFiles:
+      Debug: Config.xcconfig
+      Release: Config.xcconfig
     sources:
       - path: StatSense
         excludes:
           - "**/.DS_Store"
+          - "DemoContent/**"
+          - "Views/DemoModeView.swift"
+          - "Services/QRCodeGenerator.swift"
+          - "Views/QRCodeSheet.swift"
     settings:
       base:
         INFOPLIST_FILE: StatSense/Resources/Info.plist
@@ -38,4 +45,5 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_DeepSeekAPIKey: $(DEEPSEEK_API_KEY)
 

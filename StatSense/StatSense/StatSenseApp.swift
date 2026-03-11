@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct StatSenseApp: App {
@@ -11,6 +12,7 @@ struct StatSenseApp: App {
                 .environmentObject(accessibilityManager)
                 .environmentObject(graphAnalyzer)
         }
+        .modelContainer(for: SavedGraph.self)
     }
 }
 

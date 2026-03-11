@@ -7,14 +7,14 @@ struct ContentView: View {
     
     enum Tab: String, CaseIterable {
         case capture = "Capture"
-        case demo = "Demo"
+        case history = "History"
         case settings = "Settings"
         case info = "Info"
         
         var icon: String {
             switch self {
             case .capture: return "camera.fill"
-            case .demo: return "play.rectangle.fill"
+            case .history: return "clock.fill"
             case .settings: return "gearshape.fill"
             case .info: return "info.circle.fill"
             }
@@ -29,11 +29,11 @@ struct ContentView: View {
                 }
                 .tag(Tab.capture)
             
-            DemoModeView()
+            HistoryView()
                 .tabItem {
-                    Label(Tab.demo.rawValue, systemImage: Tab.demo.icon)
+                    Label(Tab.history.rawValue, systemImage: Tab.history.icon)
                 }
-                .tag(Tab.demo)
+                .tag(Tab.history)
             
             SettingsView()
                 .tabItem {

@@ -13,6 +13,7 @@ class GraphAnalyzer: ObservableObject {
     
     private let imageAnalyzer = ImageAnalyzer()
     private let explanationEngine = ExplanationEngine()
+    private let deepSeekService = DeepSeekService()
     
 
     func analyzeImage(_ image: UIImage) async -> InterpretationResult? {
@@ -39,43 +40,44 @@ class GraphAnalyzer: ObservableObject {
             
       
             analysisProgress = 0.6
-            let dataLines = await extractDataLines(processedImage, graphType: graphType)
+            let extractedDataLines = await extractDataLines(processedImage, graphType: graphType)
             
-
+            // Format extraction for DeepSeek
             analysisProgress = 0.7
-            let intersections = findIntersections(dataLines)
             
- 
+            let axisXString = xAxis?.description ?? "None detected"
+            let axisYString = yAxis?.description ?? "None detected"
+            let linesString = extractedDataLines.map { "\($0.label ?? "Line"): \($0.points.count) points detected" }.joined(separator: ", ")
+            
+            // Try Text Extraction for full context
+            let textExtractor = VNRecognizeTextRequest()
+            let handler = VNImageRequestHandler(cgImage: processedImage.cgImage!, options: [:])
+            var allText = ""
+            do {
+                try handler.perform([textExtractor])
+                if let textResults = textExtractor.results {
+                    allText = textResults.compactMap { $0.topCandidates(1).first?.string }.joined(separator: " ")
+                }
+            } catch {
+                print("Failed to extract text: \\(error)")
+            }
+            
             analysisProgress = 0.8
-            let overallTrend = calculateOverallTrend(dataLines)
-            
-
-            analysisProgress = 0.9
-            let (explanations, confidence, warnings) = explanationEngine.generateExplanations(
-                graphType: graphType,
-                xAxis: xAxis,
-                yAxis: yAxis,
-                dataLines: dataLines,
-                intersections: intersections,
-                trend: overallTrend
+            // Ask DeepSeek to analyze
+            var result = try await deepSeekService.analyzeGraphData(
+                textFromImage: allText,
+                axisX: axisXString,
+                axisY: axisYString,
+                detectedContours: linesString
             )
+            
+            // Re-attach the confidence heuristic if DeepSeek is overly confident
+            if result.dataLines.isEmpty {
+                result.warnings.append("No clear data lines were detected by AI.")
+                result.confidence = min(result.confidence, 0.4)
+            }
             
             analysisProgress = 1.0
-            
-            let result = InterpretationResult(
-                graphType: graphType,
-                title: "Analyzed Graph",
-                xAxis: xAxis,
-                yAxis: yAxis,
-                dataLines: dataLines,
-                intersections: intersections,
-                overallTrend: overallTrend,
-                confidence: confidence,
-                warnings: warnings,
-                explanations: explanations,
-                capturedImage: image,
-                timestamp: Date()
-            )
             
             currentResult = result
             return result

@@ -2,8 +2,8 @@ import Foundation
 import UIKit
 
 
-struct InterpretationResult: Identifiable, Equatable {
-    let id = UUID()
+struct InterpretationResult: Identifiable, Equatable, Codable {
+    var id = UUID()
     var graphType: GraphType
     var title: String
     var xAxis: AxisInfo?
@@ -16,6 +16,59 @@ struct InterpretationResult: Identifiable, Equatable {
     var explanations: [ExplanationStep]
     var capturedImage: UIImage?
     var timestamp: Date
+    
+    enum CodingKeys: String, CodingKey {
+        case id, graphType, title, xAxis, yAxis, dataLines, intersections, overallTrend, confidence, warnings, explanations, timestamp
+    }
+    
+    init(id: UUID = UUID(), graphType: GraphType, title: String, xAxis: AxisInfo? = nil, yAxis: AxisInfo? = nil, dataLines: [DataLine], intersections: [IntersectionPoint], overallTrend: TrendType, confidence: Double, warnings: [String], explanations: [ExplanationStep], capturedImage: UIImage? = nil, timestamp: Date) {
+        self.id = id
+        self.graphType = graphType
+        self.title = title
+        self.xAxis = xAxis
+        self.yAxis = yAxis
+        self.dataLines = dataLines
+        self.intersections = intersections
+        self.overallTrend = overallTrend
+        self.confidence = confidence
+        self.warnings = warnings
+        self.explanations = explanations
+        self.capturedImage = capturedImage
+        self.timestamp = timestamp
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        graphType = try container.decode(GraphType.self, forKey: .graphType)
+        title = try container.decode(String.self, forKey: .title)
+        xAxis = try container.decodeIfPresent(AxisInfo.self, forKey: .xAxis)
+        yAxis = try container.decodeIfPresent(AxisInfo.self, forKey: .yAxis)
+        dataLines = try container.decode([DataLine].self, forKey: .dataLines)
+        intersections = try container.decode([IntersectionPoint].self, forKey: .intersections)
+        overallTrend = try container.decode(TrendType.self, forKey: .overallTrend)
+        confidence = try container.decode(Double.self, forKey: .confidence)
+        warnings = try container.decode([String].self, forKey: .warnings)
+        explanations = try container.decode([ExplanationStep].self, forKey: .explanations)
+        timestamp = try container.decode(Date.self, forKey: .timestamp)
+        capturedImage = nil
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(graphType, forKey: .graphType)
+        try container.encode(title, forKey: .title)
+        try container.encodeIfPresent(xAxis, forKey: .xAxis)
+        try container.encodeIfPresent(yAxis, forKey: .yAxis)
+        try container.encode(dataLines, forKey: .dataLines)
+        try container.encode(intersections, forKey: .intersections)
+        try container.encode(overallTrend, forKey: .overallTrend)
+        try container.encode(confidence, forKey: .confidence)
+        try container.encode(warnings, forKey: .warnings)
+        try container.encode(explanations, forKey: .explanations)
+        try container.encode(timestamp, forKey: .timestamp)
+    }
     
     static func == (lhs: InterpretationResult, rhs: InterpretationResult) -> Bool {
         lhs.id == rhs.id
@@ -56,8 +109,8 @@ struct InterpretationResult: Identifiable, Equatable {
 }
 
 
-struct DataLine: Identifiable, Equatable {
-    let id = UUID()
+struct DataLine: Identifiable, Equatable, Codable {
+    var id = UUID()
     var label: String?
     var color: String?
     var points: [DataPoint]
@@ -74,8 +127,8 @@ struct DataLine: Identifiable, Equatable {
 }
 
 
-struct ExplanationStep: Identifiable, Equatable {
-    let id = UUID()
+struct ExplanationStep: Identifiable, Equatable, Codable {
+    var id = UUID()
     var order: Int
     var title: String
     var description: String
@@ -83,7 +136,7 @@ struct ExplanationStep: Identifiable, Equatable {
     var trend: TrendType?
     var hapticPattern: HapticPattern
     
-    enum HapticPattern: String, Equatable {
+    enum HapticPattern: String, Equatable, Codable {
         case none
         case rising     
         case falling     

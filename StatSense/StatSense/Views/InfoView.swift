@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct InfoView: View {
-    @State private var showingQRCode = false
-    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -26,19 +24,10 @@ struct InfoView: View {
                     technicalSection
                     
 
-                    Button(action: { showingQRCode = true }) {
-                        Label("Show Demo QR Code", systemImage: "qrcode")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(AccessibleColors.primary)
                 }
                 .padding()
             }
             .navigationTitle("About StatSense")
-            .sheet(isPresented: $showingQRCode) {
-                QRCodeSheet()
-            }
         }
     }
     

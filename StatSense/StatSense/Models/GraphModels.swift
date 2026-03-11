@@ -2,7 +2,7 @@ import Foundation
 import CoreGraphics
 
 
-enum GraphType: String, CaseIterable, Identifiable {
+enum GraphType: String, CaseIterable, Identifiable, Codable {
     case lineGraph = "Line Graph"
     case barChart = "Bar Chart"
     case scatterPlot = "Scatter Plot"
@@ -27,7 +27,7 @@ enum GraphType: String, CaseIterable, Identifiable {
 }
 
 
-enum TrendType: String, CaseIterable {
+enum TrendType: String, CaseIterable, Codable {
     case increasing = "Increasing"
     case decreasing = "Decreasing"
     case constant = "Constant"
@@ -59,7 +59,7 @@ enum TrendType: String, CaseIterable {
 }
 
 
-enum SlopeClassification: String {
+enum SlopeClassification: String, Codable {
     case steepPositive = "Steep Positive"
     case moderatePositive = "Moderate Positive"
     case gentlePositive = "Gentle Positive"
@@ -95,8 +95,8 @@ enum SlopeClassification: String {
 }
 
 
-struct DataPoint: Identifiable, Equatable {
-    let id = UUID()
+struct DataPoint: Identifiable, Equatable, Codable {
+    var id = UUID()
     var x: Double
     var y: Double
     var label: String?
@@ -107,7 +107,7 @@ struct DataPoint: Identifiable, Equatable {
 }
 
 
-struct AxisInfo: Equatable {
+struct AxisInfo: Equatable, Codable {
     var label: String
     var minValue: Double
     var maxValue: Double
@@ -133,8 +133,8 @@ struct AxisInfo: Equatable {
 }
 
 
-struct LineSegment: Identifiable, Equatable {
-    let id = UUID()
+struct LineSegment: Identifiable, Equatable, Codable {
+    var id = UUID()
     var startPoint: DataPoint
     var endPoint: DataPoint
     var trend: TrendType
@@ -145,8 +145,8 @@ struct LineSegment: Identifiable, Equatable {
     }
 }
 
-struct IntersectionPoint: Identifiable, Equatable {
-    let id = UUID()
+struct IntersectionPoint: Identifiable, Equatable, Codable {
+    var id = UUID()
     var point: DataPoint
     var line1Index: Int
     var line2Index: Int
