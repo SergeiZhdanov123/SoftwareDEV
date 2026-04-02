@@ -6,18 +6,43 @@ import CoreHaptics
 
 @MainActor
 class AccessibilityManager: ObservableObject {
-    @Published var preferences = UserPreferences()
+    @Published var preferences = UserPreferences() {
+        didSet {
+            savePreferences()
+        }
+    }
     @Published var isSpeaking = false
     @Published var currentSpeechText = ""
     @Published var hapticEngine: CHHapticEngine?
+    
+    private let preferencesKey = "com.statsense.preferences"
     
     private var speechSynthesizer = AVSpeechSynthesizer()
     private var speechDelegate: SpeechDelegate?
     
     init() {
+        loadPreferences()
         setupHapticEngine()
         speechDelegate = SpeechDelegate(manager: self)
         speechSynthesizer.delegate = speechDelegate
+    }
+    
+    private func savePreferences() {
+        do {
+            let data = try JSONEncoder().encode(preferences)
+            UserDefaults.standard.set(data, forKey: preferencesKey)
+        } catch {
+            print("Failed to save preferences: \(error)")
+        }
+    }
+    
+    private func loadPreferences() {
+        guard let data = UserDefaults.standard.data(forKey: preferencesKey) else { return }
+        do {
+            preferences = try JSONDecoder().decode(UserPreferences.self, from: data)
+        } catch {
+            print("Failed to load preferences: \(error)")
+        }
     }
     
 

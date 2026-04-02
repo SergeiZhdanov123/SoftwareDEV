@@ -5,9 +5,6 @@ struct HighContrastResultCard: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let result: InterpretationResult
     
-    private var fontSize: CGFloat {
-        accessibilityManager.preferences.visualSettings.fontSize
-    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -17,9 +14,9 @@ struct HighContrastResultCard: View {
                 
                 VStack(alignment: .leading) {
                     Text(result.graphType.rawValue)
-                        .font(.system(size: fontSize, weight: .bold))
+                        .font(.title2.bold())
                     Text(result.overallTrend.description)
-                        .font(.system(size: fontSize * 0.75))
+                        .font(.headline)
                 }
             }
             
@@ -28,7 +25,7 @@ struct HighContrastResultCard: View {
             
 
             ForEach(result.explanations.prefix(5)) { step in
-                HighContrastStepView(step: step, fontSize: fontSize)
+                HighContrastStepView(step: step)
             }
             
 
@@ -47,7 +44,6 @@ struct HighContrastResultCard: View {
 
 struct HighContrastStepView: View {
     let step: ExplanationStep
-    let fontSize: CGFloat
     
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -56,15 +52,15 @@ struct HighContrastStepView: View {
                 TrendIconView(trend: trend, size: 32)
             } else {
                 Image(systemName: "info.circle.fill")
-                    .font(.system(size: 28))
+                    .font(.title2)
                     .foregroundColor(AccessibleColors.primary)
             }
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(step.title)
-                    .font(.system(size: fontSize * 0.8, weight: .semibold))
+                    .font(.headline.weight(.semibold))
                 Text(step.description)
-                    .font(.system(size: fontSize * 0.65))
+                    .font(.body)
                     .opacity(0.9)
             }
         }

@@ -4,33 +4,29 @@ struct ExplanationStepCard: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let step: ExplanationStep
     
-    private var fontSize: CGFloat {
-        accessibilityManager.preferences.visualSettings.fontSize
-    }
-    
     var body: some View {
         Button(action: handleTap) {
             HStack(alignment: .top, spacing: 12) {
                 Text("\(step.order)")
-                    .font(.system(size: fontSize * 0.5, weight: .bold))
+                    .font(.caption.bold())
                     .foregroundColor(.white)
-                    .frame(width: fontSize * 1.1, height: fontSize * 1.1)
+                    .frame(width: 24, height: 24)
                     .background(AccessibleColors.primary)
                     .clipShape(Circle())
                 
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text(step.title)
-                            .font(.system(size: fontSize * 0.7, weight: .bold))
+                            .font(.headline.bold())
                             .foregroundColor(.primary)
                         
                         if let trend = step.trend {
-                            TrendIconView(trend: trend, size: fontSize * 0.7)
+                            TrendIconView(trend: trend, size: 24)
                         }
                     }
                     
                     Text(step.description)
-                        .font(.system(size: fontSize * 0.6))
+                        .font(.body)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.leading)
                 }

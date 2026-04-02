@@ -49,6 +49,9 @@ struct ContentView: View {
         }
         .tint(AccessibleColors.primary)
         .preferredColorScheme(accessibilityManager.preferences.visualSettings.useHighContrast ? .dark : nil)
+        .fullScreenCover(isPresented: $accessibilityManager.preferences.showOnboarding) {
+            OnboardingView(isPresented: $accessibilityManager.preferences.showOnboarding)
+        }
     }
 }
 

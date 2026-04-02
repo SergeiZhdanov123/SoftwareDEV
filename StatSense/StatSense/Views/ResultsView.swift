@@ -58,16 +58,12 @@ struct ResultsView: View {
         }
     }
     
-    private var fontSize: CGFloat {
-        accessibilityManager.preferences.visualSettings.fontSize
-    }
-   
     private var headerSection: some View {
         VStack(spacing: 12) {
             HStack {
        
                 Label(result.graphType.rawValue, systemImage: result.graphType.icon)
-                    .font(.system(size: fontSize * 0.75, weight: .bold))
+                    .font(.body.bold())
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                     .background(AccessibleColors.primary.opacity(0.2))
@@ -192,21 +188,17 @@ struct SummaryCard: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let result: InterpretationResult
     
-    private var fontSize: CGFloat {
-        accessibilityManager.preferences.visualSettings.fontSize
-    }
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Summary")
-                    .font(.system(size: fontSize * 0.8, weight: .bold))
+                    .font(.title2.bold())
                 Spacer()
-                TrendIconView(trend: result.overallTrend, size: fontSize * 1.2)
+                TrendIconView(trend: result.overallTrend, size: 32)
             }
             
             Text(result.summary)
-                .font(.system(size: fontSize * 0.7))
+                .font(.body)
                 .foregroundColor(.secondary)
         }
         .padding()

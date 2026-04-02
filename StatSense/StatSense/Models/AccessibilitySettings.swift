@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 
-enum AccessibilityMode: String, CaseIterable, Identifiable {
+enum AccessibilityMode: String, CaseIterable, Identifiable, Codable {
     case audio = "Audio"
     case visual = "Visual"
     case haptic = "Haptic"
@@ -30,7 +30,7 @@ enum AccessibilityMode: String, CaseIterable, Identifiable {
 }
 
 
-struct SpeechSettings: Equatable {
+struct SpeechSettings: Equatable, Codable {
     var rate: Float = 0.5 
     var pitch: Float = 1.0 
     var volume: Float = 1.0 
@@ -47,7 +47,7 @@ struct SpeechSettings: Equatable {
     }
 }
 
-struct VisualSettings: Equatable {
+struct VisualSettings: Equatable, Codable {
     var fontSize: CGFloat = 24
     var useHighContrast: Bool = true
     var colorBlindMode: ColorBlindMode = .none
@@ -55,7 +55,19 @@ struct VisualSettings: Equatable {
     var showConfidenceIndicator: Bool = true
     var animationsEnabled: Bool = true
     
-    enum ColorBlindMode: String, CaseIterable, Identifiable {
+    var dynamicTypeSize: DynamicTypeSize {
+        switch fontSize {
+        case 16..<20: return .medium
+        case 20..<24: return .large
+        case 24..<28: return .xxLarge
+        case 28..<32: return .accessibility1
+        case 32..<36: return .accessibility3
+        case 36...: return .accessibility5
+        default: return .medium
+        }
+    }
+    
+    enum ColorBlindMode: String, CaseIterable, Identifiable, Codable {
         case none = "Standard"
         case protanopia = "Protanopia"
         case deuteranopia = "Deuteranopia"
@@ -67,7 +79,7 @@ struct VisualSettings: Equatable {
 }
 
 
-struct HapticSettings: Equatable {
+struct HapticSettings: Equatable, Codable {
     var intensity: Float = 0.8 
     var enabled: Bool = true
     var patternDuration: Double = 0.5
@@ -83,7 +95,7 @@ struct HapticSettings: Equatable {
 }
 
 
-struct UserPreferences: Equatable {
+struct UserPreferences: Equatable, Codable {
     var primaryMode: AccessibilityMode = .combined
     var speechSettings: SpeechSettings = SpeechSettings()
     var visualSettings: VisualSettings = VisualSettings()
