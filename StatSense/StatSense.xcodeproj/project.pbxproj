@@ -55,7 +55,7 @@
 		6F6EA9B7EB06B28060AAFACF /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		7643B288547CD62E7F66FD7C /* GraphAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphAnalyzer.swift; sourceTree = "<group>"; };
 		7FAA8A7FCDC3DB7849734C8F /* ImageAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAnalyzer.swift; sourceTree = "<group>"; };
-		828A1CD7B756BA0660764F1B /* StatSense.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = StatSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		828A1CD7B756BA0660764F1B /* StatSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StatSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83FE1614CB2A13A73A76F782 /* AccessibilityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityManager.swift; sourceTree = "<group>"; };
 		84235EE59E59320F0D86E889 /* AccessibilityModeIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityModeIndicator.swift; sourceTree = "<group>"; };
 		A47FCA0E965D906E0193B4DB /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
@@ -218,13 +218,11 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					899347E1685C815C2E8E7719 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
 			};
 			buildConfigurationList = CE8B329933A927B788CD3F8E /* Build configuration list for PBXProject "StatSense" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -234,6 +232,7 @@
 			mainGroup = 5A937F117C379479690C9B49;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
+			productRefGroup = 8A4048F7D11DAB71A7329BC7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -357,7 +356,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3Y5U57J7TG;
 				INFOPLIST_FILE = StatSense/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = StatSense;
 				INFOPLIST_KEY_DeepSeekAPIKey = "$(DEEPSEEK_API_KEY)";
@@ -386,7 +385,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3Y5U57J7TG;
 				INFOPLIST_FILE = StatSense/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = StatSense;
 				INFOPLIST_KEY_DeepSeekAPIKey = "$(DEEPSEEK_API_KEY)";

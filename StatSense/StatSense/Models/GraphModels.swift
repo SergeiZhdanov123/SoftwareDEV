@@ -96,10 +96,29 @@ enum SlopeClassification: String, Codable {
 
 
 struct DataPoint: Identifiable, Equatable, Codable {
-    var id = UUID()
+    var id: UUID
     var x: Double
     var y: Double
     var label: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, x, y, label
+    }
+    
+    init(id: UUID = UUID(), x: Double, y: Double, label: String? = nil) {
+        self.id = id
+        self.x = x
+        self.y = y
+        self.label = label
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        x = try container.decode(Double.self, forKey: .x)
+        y = try container.decode(Double.self, forKey: .y)
+        label = try container.decodeIfPresent(String.self, forKey: .label)
+    }
     
     var cgPoint: CGPoint {
         CGPoint(x: x, y: y)
@@ -134,11 +153,32 @@ struct AxisInfo: Equatable, Codable {
 
 
 struct LineSegment: Identifiable, Equatable, Codable {
-    var id = UUID()
+    var id: UUID
     var startPoint: DataPoint
     var endPoint: DataPoint
     var trend: TrendType
     var slope: SlopeClassification
+    
+    enum CodingKeys: String, CodingKey {
+        case id, startPoint, endPoint, trend, slope
+    }
+    
+    init(id: UUID = UUID(), startPoint: DataPoint, endPoint: DataPoint, trend: TrendType, slope: SlopeClassification) {
+        self.id = id
+        self.startPoint = startPoint
+        self.endPoint = endPoint
+        self.trend = trend
+        self.slope = slope
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        startPoint = try container.decode(DataPoint.self, forKey: .startPoint)
+        endPoint = try container.decode(DataPoint.self, forKey: .endPoint)
+        trend = try container.decode(TrendType.self, forKey: .trend)
+        slope = try container.decode(SlopeClassification.self, forKey: .slope)
+    }
     
     var description: String {
         "From (\(startPoint.x), \(startPoint.y)) to (\(endPoint.x), \(endPoint.y)): \(slope.description)"
@@ -146,10 +186,29 @@ struct LineSegment: Identifiable, Equatable, Codable {
 }
 
 struct IntersectionPoint: Identifiable, Equatable, Codable {
-    var id = UUID()
+    var id: UUID
     var point: DataPoint
     var line1Index: Int
     var line2Index: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case id, point, line1Index, line2Index
+    }
+    
+    init(id: UUID = UUID(), point: DataPoint, line1Index: Int, line2Index: Int) {
+        self.id = id
+        self.point = point
+        self.line1Index = line1Index
+        self.line2Index = line2Index
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        point = try container.decode(DataPoint.self, forKey: .point)
+        line1Index = try container.decode(Int.self, forKey: .line1Index)
+        line2Index = try container.decode(Int.self, forKey: .line2Index)
+    }
     
     var description: String {
         "Lines intersect at approximately x = \(String(format: "%.1f", point.x)), y = \(String(format: "%.1f", point.y))"

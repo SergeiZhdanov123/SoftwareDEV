@@ -102,22 +102,76 @@ struct AccessibleColors {
     static let tertiary = Color(red: 0.0, green: 0.6, blue: 0.5)      
     static let quaternary = Color(red: 0.8, green: 0.4, blue: 0.0)    
     
-    static let success = Color(red: 0.0, green: 0.6, blue: 0.4)       
-    static let warning = Color(red: 0.95, green: 0.77, blue: 0.06)    
-    static let error = Color(red: 0.8, green: 0.2, blue: 0.2)         
+    // Standard Semantic Colors
+    private static var standardSuccess: Color { Color(red: 0.15, green: 0.6, blue: 0.15) }
+    private static var standardWarning: Color { Color(red: 0.95, green: 0.6, blue: 0.1) }
+    private static var standardError: Color { Color(red: 0.85, green: 0.2, blue: 0.2) }
+    
+    // Convenience properties for standard mode
+    static var success: Color { standardSuccess }
+    static var warning: Color { standardWarning }
+    static var error: Color { standardError }
+    
+    // Convenience functions for specific modes
+    static func success(mode: VisualSettings.ColorBlindMode) -> Color {
+        trendColor(for: .increasing, mode: mode)
+    }
+    
+    static func warning(mode: VisualSettings.ColorBlindMode) -> Color {
+        trendColor(for: .fluctuating, mode: mode)
+    }
+    
+    static func error(mode: VisualSettings.ColorBlindMode) -> Color {
+        trendColor(for: .decreasing, mode: mode)
+    }
     
     static let highContrastBackground = Color.black
     static let highContrastText = Color.white
     static let highContrastAccent = Color.yellow
     
-    static func trendColor(for trend: TrendType) -> Color {
+    static func trendColor(for trend: TrendType, mode: VisualSettings.ColorBlindMode = .none) -> Color {
+        switch mode {
+        case .monochrome:
+            return monochromeTrendColor(for: trend)
+        case .protanopia, .deuteranopia:
+            return blueYellowTrendColor(for: trend)
+        case .tritanopia:
+            return redCyanTrendColor(for: trend)
+        case .none:
+            switch trend {
+            case .increasing: return standardSuccess
+            case .decreasing: return standardError
+            case .constant: return primary
+            case .fluctuating: return standardWarning
+            case .exponential: return tertiary
+            case .logarithmic: return secondary
+            }
+        }
+    }
+    
+    private static func monochromeTrendColor(for trend: TrendType) -> Color {
         switch trend {
-        case .increasing: return success
-        case .decreasing: return error
-        case .constant: return primary
-        case .fluctuating: return warning
-        case .exponential: return tertiary
-        case .logarithmic: return secondary
+        case .increasing, .exponential: return .white
+        case .decreasing, .logarithmic: return .gray
+        default: return .secondary
+        }
+    }
+    
+    private static func blueYellowTrendColor(for trend: TrendType) -> Color {
+        // Safe for Protanopia and Deuteranopia
+        switch trend {
+        case .increasing, .exponential: return Color(red: 0.0, green: 0.27, blue: 0.67) // Deep Blue
+        case .decreasing, .logarithmic: return Color(red: 0.9, green: 0.7, blue: 0.0)  // Golden Yellow
+        default: return .primary
+        }
+    }
+    
+    private static func redCyanTrendColor(for trend: TrendType) -> Color {
+        // Safe for Tritanopia
+        switch trend {
+        case .increasing, .exponential: return Color(red: 0.0, green: 0.6, blue: 0.6) // Cyan
+        case .decreasing, .logarithmic: return Color(red: 0.8, green: 0.0, blue: 0.0)  // Red
+        default: return .primary
         }
     }
 }

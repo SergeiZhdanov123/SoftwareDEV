@@ -45,9 +45,6 @@ class GraphAnalyzer: ObservableObject {
             // Format extraction for DeepSeek
             analysisProgress = 0.7
             
-            let axisXString = xAxis?.description ?? "None detected"
-            let axisYString = yAxis?.description ?? "None detected"
-            let linesString = extractedDataLines.map { "\($0.label ?? "Line"): \($0.points.count) points detected" }.joined(separator: ", ")
             
             // Try Text Extraction for full context
             let textExtractor = VNRecognizeTextRequest()
@@ -59,8 +56,24 @@ class GraphAnalyzer: ObservableObject {
                     allText = textResults.compactMap { $0.topCandidates(1).first?.string }.joined(separator: " ")
                 }
             } catch {
-                print("Failed to extract text: \\(error)")
+                print("Failed to extract text: \(error)")
             }
+            
+            let axisXString = xAxis?.description ?? "None detected"
+            let axisYString = yAxis?.description ?? "None detected"
+            
+            // Provide sample points to DeepSeek so it can "see" the trend numerically
+            let linesString = extractedDataLines.map { line in
+                let label = line.label ?? "Line"
+                let count = line.points.count
+                if count > 0 {
+                    let first = line.points.first!
+                    let last = line.points.last!
+                    let mid = line.points[count / 2]
+                    return "\(label): \(count) points. Samples: Start(\(Int(first.x)), \(Int(first.y))), Mid(\(Int(mid.x)), \(Int(mid.y))), End(\(Int(last.x)), \(Int(last.y)))"
+                }
+                return "\(label): No points detected"
+            }.joined(separator: "\n")
             
             analysisProgress = 0.8
             // Ask DeepSeek to analyze
@@ -79,10 +92,15 @@ class GraphAnalyzer: ObservableObject {
             
             analysisProgress = 1.0
             
+            // Set local metadata that LLM cannot know
+            result.capturedImage = image
+            result.timestamp = Date()
+            
             currentResult = result
             return result
             
         } catch {
+            print("ANALYSIS ERROR: \(error)")
             errorMessage = error.localizedDescription
             return nil
         }

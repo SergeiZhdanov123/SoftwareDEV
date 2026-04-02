@@ -101,6 +101,13 @@ class CameraService: NSObject, ObservableObject {
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
             
+            guard self.session.isRunning, !self.session.inputs.isEmpty else {
+                DispatchQueue.main.async {
+                    self.photoCompletion?(nil)
+                }
+                return
+            }
+            
             let settings = AVCapturePhotoSettings()
             settings.flashMode = .auto
             

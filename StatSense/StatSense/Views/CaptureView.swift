@@ -61,6 +61,21 @@ struct CaptureView: View {
                     analyzeImage(image)
                 }
             }
+            .alert("Analysis Error", isPresented: Binding<Bool>(
+                get: { graphAnalyzer.errorMessage != nil || cameraService.error != nil },
+                set: { if !$0 { 
+                    graphAnalyzer.errorMessage = nil
+                    cameraService.error = nil
+                } }
+            )) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                if let message = graphAnalyzer.errorMessage {
+                    Text(message)
+                } else if let cameraError = cameraService.error {
+                    Text(cameraError.localizedDescription)
+                }
+            }
         }
     }
     
@@ -146,6 +161,8 @@ struct CaptureView: View {
         cameraService.capturePhoto { image in
             if let capturedImage = image {
                 analyzeImage(capturedImage)
+            } else {
+                graphAnalyzer.errorMessage = "Failed to capture photo. Please check camera permissions or try again."
             }
         }
     }
@@ -158,6 +175,7 @@ struct CaptureView: View {
                     do {
                         let savedGraph = try SavedGraph(imageData: compressedData, interpretationResult: result)
                         modelContext.insert(savedGraph)
+                        try modelContext.save() // Force immediate save for history tab visibility
                     } catch {
                         print("Failed to save graph to history: \(error)")
                     }

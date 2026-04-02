@@ -4,31 +4,33 @@ struct ExplanationStepCard: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let step: ExplanationStep
     
+    private var fontSize: CGFloat {
+        accessibilityManager.preferences.visualSettings.fontSize
+    }
+    
     var body: some View {
         Button(action: handleTap) {
             HStack(alignment: .top, spacing: 12) {
-
                 Text("\(step.order)")
-                    .font(.caption)
-                    .fontWeight(.bold)
+                    .font(.system(size: fontSize * 0.5, weight: .bold))
                     .foregroundColor(.white)
-                    .frame(width: 28, height: 28)
+                    .frame(width: fontSize * 1.1, height: fontSize * 1.1)
                     .background(AccessibleColors.primary)
                     .clipShape(Circle())
                 
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text(step.title)
-                            .font(.headline)
+                            .font(.system(size: fontSize * 0.7, weight: .bold))
                             .foregroundColor(.primary)
                         
                         if let trend = step.trend {
-                            TrendIconView(trend: trend, size: 18)
+                            TrendIconView(trend: trend, size: fontSize * 0.7)
                         }
                     }
                     
                     Text(step.description)
-                        .font(.body)
+                        .font(.system(size: fontSize * 0.6))
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.leading)
                 }
@@ -63,23 +65,32 @@ struct ExplanationStepCard: View {
 
 
 struct WarningsCard: View {
+    @EnvironmentObject var accessibilityManager: AccessibilityManager
     let warnings: [String]
+    
+    private var fontSize: CGFloat {
+        accessibilityManager.preferences.visualSettings.fontSize
+    }
+    
+    private var mode: VisualSettings.ColorBlindMode {
+        accessibilityManager.preferences.visualSettings.colorBlindMode
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Warnings", systemImage: "exclamationmark.triangle.fill")
-                .font(.headline)
-                .foregroundColor(AccessibleColors.warning)
+                .font(.system(size: fontSize * 0.7, weight: .bold))
+                .foregroundColor(AccessibleColors.warning(mode: mode))
             
             ForEach(warnings, id: \.self) { warning in
                 Text("• \(warning)")
-                    .font(.subheadline)
+                    .font(.system(size: fontSize * 0.6))
                     .foregroundColor(.secondary)
             }
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AccessibleColors.warning.opacity(0.1))
+        .background(AccessibleColors.warning(mode: mode).opacity(0.1))
         .cornerRadius(12)
     }
 }

@@ -134,20 +134,22 @@ struct RecognizedTextBlock {
 }
 
 
-enum AnalysisError: LocalizedError {
+enum AnalysisError: Error, LocalizedError {
     case preprocessingFailed
     case noGraphDetected
     case analysisTimeout
     case lowConfidence
     case unsupportedGraphType
+    case invalidResponse
     
     var errorDescription: String? {
         switch self {
-        case .preprocessingFailed: return "Failed to process the image"
-        case .noGraphDetected: return "No graph or chart detected in the image"
-        case .analysisTimeout: return "Analysis took too long"
-        case .lowConfidence: return "Could not reliably interpret the graph"
-        case .unsupportedGraphType: return "This type of graph is not yet supported"
+        case .preprocessingFailed: return "Could not optimize image for AI analysis."
+        case .noGraphDetected: return "No graph or chart detected in the image."
+        case .analysisTimeout: return "Analysis took too long."
+        case .lowConfidence: return "Could not reliably interpret the graph."
+        case .unsupportedGraphType: return "This type of graph is not yet supported."
+        case .invalidResponse: return "The AI returned an unreadable response."
         }
     }
 }

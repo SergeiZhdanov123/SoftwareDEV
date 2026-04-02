@@ -74,6 +74,7 @@ struct HighContrastStepView: View {
 
 
 struct ConfidenceBarView: View {
+    @EnvironmentObject var accessibilityManager: AccessibilityManager
     let confidence: Double
     
     var body: some View {
@@ -107,11 +108,15 @@ struct ConfidenceBarView: View {
         .cornerRadius(12)
     }
     
+    private var mode: VisualSettings.ColorBlindMode {
+        accessibilityManager.preferences.visualSettings.colorBlindMode
+    }
+    
     private var confidenceColor: Color {
         switch confidence {
-        case 0.8...: return AccessibleColors.success
-        case 0.5..<0.8: return AccessibleColors.warning
-        default: return AccessibleColors.error
+        case 0.8...: return AccessibleColors.success(mode: mode)
+        case 0.5..<0.8: return AccessibleColors.warning(mode: mode)
+        default: return AccessibleColors.error(mode: mode)
         }
     }
 }

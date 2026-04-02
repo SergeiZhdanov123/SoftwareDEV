@@ -12,21 +12,20 @@ struct ResultsView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                
-                    if let image = result.capturedImage {
-                        ImagePreviewCard(image: image)
+                    if accessibilityManager.preferences.visualSettings.useHighContrast {
+                        HighContrastResultCard(result: result)
+                    } else {
+                        if let image = result.capturedImage {
+                            ImagePreviewCard(image: image)
+                        }
+                        
+                        headerSection
+                        
+                        SummaryCard(result: result)
+                        
+                        explanationSection
                     }
                     
-                   
-                    headerSection
-                    
-                    
-                    SummaryCard(result: result)
-                    
-               
-                    explanationSection
-                    
-             
                     if isExploring {
                         StepByStepExplorer(
                             steps: result.explanations,
@@ -59,13 +58,16 @@ struct ResultsView: View {
         }
     }
     
+    private var fontSize: CGFloat {
+        accessibilityManager.preferences.visualSettings.fontSize
+    }
    
     private var headerSection: some View {
         VStack(spacing: 12) {
             HStack {
        
                 Label(result.graphType.rawValue, systemImage: result.graphType.icon)
-                    .font(.headline)
+                    .font(.system(size: fontSize * 0.75, weight: .bold))
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                     .background(AccessibleColors.primary.opacity(0.2))
@@ -187,19 +189,24 @@ struct ImagePreviewCard: View {
 
 
 struct SummaryCard: View {
+    @EnvironmentObject var accessibilityManager: AccessibilityManager
     let result: InterpretationResult
+    
+    private var fontSize: CGFloat {
+        accessibilityManager.preferences.visualSettings.fontSize
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Summary")
-                    .font(.headline)
+                    .font(.system(size: fontSize * 0.8, weight: .bold))
                 Spacer()
-                TrendIconView(trend: result.overallTrend, size: 28)
+                TrendIconView(trend: result.overallTrend, size: fontSize * 1.2)
             }
             
             Text(result.summary)
-                .font(.body)
+                .font(.system(size: fontSize * 0.7))
                 .foregroundColor(.secondary)
         }
         .padding()

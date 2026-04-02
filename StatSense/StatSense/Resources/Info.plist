@@ -63,6 +63,8 @@
     <string>public.app-category.education</string>
     <key>UIAccessibilityEnabled</key>
     <true/>
+    <key>DeepSeekAPIKey</key>
+    <string>sk-8ee0be72cffd45f1b637965b901f0c3d</string>
 </dict>
 </plist>
 

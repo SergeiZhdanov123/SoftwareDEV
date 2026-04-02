@@ -39,7 +39,7 @@ struct InterpretationResult: Identifiable, Equatable, Codable {
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         graphType = try container.decode(GraphType.self, forKey: .graphType)
         title = try container.decode(String.self, forKey: .title)
         xAxis = try container.decodeIfPresent(AxisInfo.self, forKey: .xAxis)
@@ -50,7 +50,7 @@ struct InterpretationResult: Identifiable, Equatable, Codable {
         confidence = try container.decode(Double.self, forKey: .confidence)
         warnings = try container.decode([String].self, forKey: .warnings)
         explanations = try container.decode([ExplanationStep].self, forKey: .explanations)
-        timestamp = try container.decode(Date.self, forKey: .timestamp)
+        timestamp = try container.decodeIfPresent(Date.self, forKey: .timestamp) ?? Date()
         capturedImage = nil
     }
     
@@ -110,13 +110,38 @@ struct InterpretationResult: Identifiable, Equatable, Codable {
 
 
 struct DataLine: Identifiable, Equatable, Codable {
-    var id = UUID()
+    var id: UUID
     var label: String?
     var color: String?
     var points: [DataPoint]
     var segments: [LineSegment]
     var trend: TrendType
     var averageSlope: SlopeClassification
+    
+    enum CodingKeys: String, CodingKey {
+        case id, label, color, points, segments, trend, averageSlope
+    }
+    
+    init(id: UUID = UUID(), label: String? = nil, color: String? = nil, points: [DataPoint] = [], segments: [LineSegment] = [], trend: TrendType = .constant, averageSlope: SlopeClassification = .flat) {
+        self.id = id
+        self.label = label
+        self.color = color
+        self.points = points
+        self.segments = segments
+        self.trend = trend
+        self.averageSlope = averageSlope
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        label = try container.decodeIfPresent(String.self, forKey: .label)
+        color = try container.decodeIfPresent(String.self, forKey: .color)
+        points = try container.decode([DataPoint].self, forKey: .points)
+        segments = try container.decode([LineSegment].self, forKey: .segments)
+        trend = try container.decode(TrendType.self, forKey: .trend)
+        averageSlope = try container.decode(SlopeClassification.self, forKey: .averageSlope)
+    }
     
     var description: String {
         var desc = label ?? "A line"
@@ -128,13 +153,38 @@ struct DataLine: Identifiable, Equatable, Codable {
 
 
 struct ExplanationStep: Identifiable, Equatable, Codable {
-    var id = UUID()
+    var id: UUID
     var order: Int
     var title: String
     var description: String
     var region: CGRect? 
     var trend: TrendType?
     var hapticPattern: HapticPattern
+    
+    enum CodingKeys: String, CodingKey {
+        case id, order, title, description, region, trend, hapticPattern
+    }
+    
+    init(id: UUID = UUID(), order: Int, title: String, description: String, region: CGRect? = nil, trend: TrendType? = nil, hapticPattern: HapticPattern = .none) {
+        self.id = id
+        self.order = order
+        self.title = title
+        self.description = description
+        self.region = region
+        self.trend = trend
+        self.hapticPattern = hapticPattern
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        order = try container.decode(Int.self, forKey: .order)
+        title = try container.decode(String.self, forKey: .title)
+        description = try container.decode(String.self, forKey: .description)
+        region = try container.decodeIfPresent(CGRect.self, forKey: .region)
+        trend = try container.decodeIfPresent(TrendType.self, forKey: .trend)
+        hapticPattern = try container.decode(HapticPattern.self, forKey: .hapticPattern)
+    }
     
     enum HapticPattern: String, Equatable, Codable {
         case none

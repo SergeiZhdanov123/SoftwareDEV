@@ -103,6 +103,7 @@ struct ModeSelectorSheet: View {
 
 
 struct TrendIconView: View {
+    @EnvironmentObject var accessibilityManager: AccessibilityManager
     let trend: TrendType
     let size: CGFloat
     
@@ -114,13 +115,14 @@ struct TrendIconView: View {
     var body: some View {
         Text(trend.icon)
             .font(.system(size: size, weight: .bold))
-            .foregroundColor(AccessibleColors.trendColor(for: trend))
+            .foregroundColor(AccessibleColors.trendColor(for: trend, mode: accessibilityManager.preferences.visualSettings.colorBlindMode))
             .accessibilityLabel(trend.description)
     }
 }
 
 
 struct ConfidenceIndicator: View {
+    @EnvironmentObject var accessibilityManager: AccessibilityManager
     let confidence: Double
     
     var body: some View {
@@ -146,10 +148,11 @@ struct ConfidenceIndicator: View {
     }
     
     private var confidenceColor: Color {
+        let mode = accessibilityManager.preferences.visualSettings.colorBlindMode
         switch confidence {
-        case 0.8...: return AccessibleColors.success
-        case 0.5..<0.8: return AccessibleColors.warning
-        default: return AccessibleColors.error
+        case 0.8...: return AccessibleColors.trendColor(for: .increasing, mode: mode)
+        case 0.5..<0.8: return AccessibleColors.trendColor(for: .fluctuating, mode: mode)
+        default: return AccessibleColors.trendColor(for: .decreasing, mode: mode)
         }
     }
 }
