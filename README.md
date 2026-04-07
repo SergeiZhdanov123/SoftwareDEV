@@ -1,4 +1,4 @@
-# StatSense
+# StatSense PA TSA States 2026 Submission Team 2098-901
 
 **Making Statistical Data Accessible for Everyone**
 
@@ -120,13 +120,6 @@ StatSense uses XcodeGen for project management to maintain a clean repository.
 
 ---
 
-## Roadmap
 
-- [ ] **Multi-Line Support**: Advanced detection for overlapping data series.
-- [ ] **Offline Mode**: Integration of local models for privacy-first analysis.
-- [ ] **Complex Diagramming**: Support for structural diagrams and flowcharts.
-- [ ] **Braille Integration**: Exporting data tables directly to Refreshable Braille Displays.
 
----
 
-Developed for Technology Student Association (TSA).
