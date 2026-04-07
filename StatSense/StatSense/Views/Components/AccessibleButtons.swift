@@ -1,12 +1,11 @@
 import SwiftUI
 
-
 struct PrimaryActionButton: View {
     let title: String
     let icon: String
     let action: () -> Void
     var isLoading: Bool = false
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
@@ -31,12 +30,11 @@ struct PrimaryActionButton: View {
     }
 }
 
-
 struct SecondaryActionButton: View {
     let title: String
     let icon: String
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
@@ -55,14 +53,13 @@ struct SecondaryActionButton: View {
     }
 }
 
-
 struct CircularActionButton: View {
     let icon: String
     let size: CGFloat
     let backgroundColor: Color
     let foregroundColor: Color
     let action: () -> Void
-    
+
     init(
         icon: String,
         size: CGFloat = 60,
@@ -76,7 +73,7 @@ struct CircularActionButton: View {
         self.foregroundColor = foregroundColor
         self.action = action
     }
-    
+
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
@@ -89,18 +86,17 @@ struct CircularActionButton: View {
     }
 }
 
-
 struct CaptureButton: View {
     let action: () -> Void
     var isAnalyzing: Bool = false
-    
+
     var body: some View {
         Button(action: action) {
             ZStack {
                 Circle()
                     .strokeBorder(Color.white, lineWidth: 4)
                     .frame(width: 80, height: 80)
-                
+
                 if isAnalyzing {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
@@ -109,7 +105,7 @@ struct CaptureButton: View {
                     Circle()
                         .fill(AccessibleColors.primary)
                         .frame(width: 65, height: 65)
-                    
+
                     Image(systemName: "camera.fill")
                         .font(.title)
                         .foregroundColor(.white)
@@ -121,23 +117,22 @@ struct CaptureButton: View {
     }
 }
 
-
 struct NavigationControlButton: View {
     let direction: Direction
     let isEnabled: Bool
     let action: () -> Void
-    
+
     enum Direction {
         case previous
         case next
-        
+
         var icon: String {
             switch self {
             case .previous: return "chevron.left.circle.fill"
             case .next: return "chevron.right.circle.fill"
             }
         }
-        
+
         var label: String {
             switch self {
             case .previous: return "Previous"
@@ -145,7 +140,7 @@ struct NavigationControlButton: View {
             }
         }
     }
-    
+
     var body: some View {
         Button(action: action) {
             Image(systemName: direction.icon)
@@ -158,11 +153,10 @@ struct NavigationControlButton: View {
     }
 }
 
-
 struct AudioControlBar: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let text: String
-    
+
     var body: some View {
         HStack(spacing: 20) {
 
@@ -172,7 +166,6 @@ struct AudioControlBar: View {
                     .foregroundColor(AccessibleColors.primary)
             }
             .accessibilityLabel(accessibilityManager.isSpeaking ? "Pause" : "Play")
-            
 
             Button(action: { accessibilityManager.speak(text, priority: true) }) {
                 Image(systemName: "arrow.counterclockwise.circle.fill")
@@ -180,7 +173,6 @@ struct AudioControlBar: View {
                     .foregroundColor(AccessibleColors.secondary)
             }
             .accessibilityLabel("Repeat")
-            
 
             Text(accessibilityManager.preferences.speechSettings.rateDescription)
                 .font(.caption)
@@ -191,7 +183,7 @@ struct AudioControlBar: View {
         .background(Color(.systemGray6))
         .cornerRadius(12)
     }
-    
+
     private func togglePlayback() {
         if accessibilityManager.isSpeaking {
             accessibilityManager.pauseSpeaking()
@@ -205,13 +197,13 @@ struct AudioControlBar: View {
     VStack(spacing: 20) {
         PrimaryActionButton(title: "Analyze Graph", icon: "camera.fill") {}
         SecondaryActionButton(title: "View History", icon: "clock") {}
-        
+
         HStack(spacing: 40) {
             CircularActionButton(icon: "photo") {}
             CaptureButton {}
             CircularActionButton(icon: "switch.2") {}
         }
-        
+
         HStack(spacing: 40) {
             NavigationControlButton(direction: .previous, isEnabled: true) {}
             NavigationControlButton(direction: .next, isEnabled: false) {}

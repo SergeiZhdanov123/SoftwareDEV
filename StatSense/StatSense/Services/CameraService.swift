@@ -3,23 +3,21 @@ import AVFoundation
 import UIKit
 import SwiftUI
 
-
 class CameraService: NSObject, ObservableObject {
     @Published var capturedImage: UIImage?
     @Published var isAuthorized = false
     @Published var isSessionRunning = false
     @Published var error: CameraError?
-    
+
     let session = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
     private let sessionQueue = DispatchQueue(label: "camera.session.queue")
     private var photoCompletion: ((UIImage?) -> Void)?
-    
+
     override init() {
         super.init()
         checkAuthorization()
     }
-    
 
     func checkAuthorization() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -39,15 +37,13 @@ class CameraService: NSObject, ObservableObject {
             isAuthorized = false
         }
     }
-    
 
     private func setupSession() {
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
-            
+
             self.session.beginConfiguration()
             self.session.sessionPreset = .photo
-            
 
             guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
                   let input = try? AVCaptureDeviceInput(device: camera),
@@ -57,9 +53,8 @@ class CameraService: NSObject, ObservableObject {
                 }
                 return
             }
-            
+
             self.session.addInput(input)
-            
 
             guard self.session.canAddOutput(self.photoOutput) else {
                 DispatchQueue.main.async {
@@ -67,12 +62,11 @@ class CameraService: NSObject, ObservableObject {
                 }
                 return
             }
-            
+
             self.session.addOutput(self.photoOutput)
             self.session.commitConfiguration()
         }
     }
-    
 
     func startSession() {
         sessionQueue.async { [weak self] in
@@ -83,7 +77,7 @@ class CameraService: NSObject, ObservableObject {
             }
         }
     }
-    
+
     func stopSession() {
         sessionQueue.async { [weak self] in
             guard let self = self, self.session.isRunning else { return }
@@ -93,29 +87,27 @@ class CameraService: NSObject, ObservableObject {
             }
         }
     }
-    
 
     func capturePhoto(completion: @escaping (UIImage?) -> Void) {
         photoCompletion = completion
-        
+
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
-            
+
             guard self.session.isRunning, !self.session.inputs.isEmpty else {
                 DispatchQueue.main.async {
                     self.photoCompletion?(nil)
                 }
                 return
             }
-            
+
             let settings = AVCapturePhotoSettings()
             settings.flashMode = .auto
-            
+
             self.photoOutput.capturePhoto(with: settings, delegate: self)
         }
     }
 }
-
 
 extension CameraService: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
@@ -127,7 +119,7 @@ extension CameraService: AVCapturePhotoCaptureDelegate {
             }
             return
         }
-        
+
         DispatchQueue.main.async { [weak self] in
             self?.capturedImage = image
             self?.photoCompletion?(image)
@@ -135,13 +127,12 @@ extension CameraService: AVCapturePhotoCaptureDelegate {
     }
 }
 
-
 enum CameraError: LocalizedError {
     case cameraUnavailable
     case outputUnavailable
     case captureError
     case unauthorized
-    
+
     var errorDescription: String? {
         switch self {
         case .cameraUnavailable: return "Camera is not available"
@@ -152,20 +143,19 @@ enum CameraError: LocalizedError {
     }
 }
 
-
 struct CameraPreviewView: UIViewRepresentable {
     let session: AVCaptureSession
-    
+
     class VideoPreviewView: UIView {
         override class var layerClass: AnyClass {
             AVCaptureVideoPreviewLayer.self
         }
-        
+
         var videoPreviewLayer: AVCaptureVideoPreviewLayer {
             return layer as! AVCaptureVideoPreviewLayer
         }
     }
-    
+
     func makeUIView(context: Context) -> VideoPreviewView {
         let view = VideoPreviewView()
         view.backgroundColor = .black
@@ -173,9 +163,9 @@ struct CameraPreviewView: UIViewRepresentable {
         view.videoPreviewLayer.videoGravity = .resizeAspectFill
         return view
     }
-    
+
     func updateUIView(_ uiView: VideoPreviewView, context: Context) {
-        // No update needed
+
     }
 }
 

@@ -5,24 +5,18 @@ struct InfoView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    
+
                     appHeader
-                    
-                    
+
                     problemSection
-                    
-                    
+
                     solutionSection
-                    
-                  
+
                     featuresSection
-                    
-                  
+
                     howItWorksSection
-                    
-               
+
                     technicalSection
-                    
 
                 }
                 .padding()
@@ -30,8 +24,7 @@ struct InfoView: View {
             .navigationTitle("About StatSense")
         }
     }
-    
-    
+
     private var appHeader: some View {
         VStack(spacing: 12) {
             Image(systemName: "chart.line.uptrend.xyaxis.circle.fill")
@@ -43,18 +36,17 @@ struct InfoView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-            
+
             Text("StatSense")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-            
+
             Text("Making STEM Accessible for Everyone")
                 .font(.headline)
                 .foregroundColor(.secondary)
         }
         .padding(.vertical)
     }
-    
 
     private var problemSection: some View {
         InfoCard(
@@ -64,13 +56,12 @@ struct InfoView: View {
             content: """
             Millions of blind and deaf students are excluded from STEM education because critical \
             information is presented visually through graphs, charts, diagrams, and whiteboard drawings.
-            
+
             Traditional accessibility tools cannot interpret the meaning of visual data—they can only \
             describe what text is present, leaving students without access to the actual content.
             """
         )
     }
-
 
     private var solutionSection: some View {
         InfoCard(
@@ -80,7 +71,7 @@ struct InfoView: View {
             content: """
             StatSense uses on-device AI to interpret visual data and convert it into structured, \
             meaningful explanations. Unlike simple text readers, StatSense understands:
-            
+
             • What type of graph it's looking at
             • The axes, scales, and labels
             • Data trends and patterns
@@ -89,14 +80,13 @@ struct InfoView: View {
             """
         )
     }
-    
 
     private var featuresSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Key Features")
                 .font(.title2)
                 .fontWeight(.bold)
-            
+
             FeatureRow(icon: "speaker.wave.3.fill", title: "Audio Mode", description: "Voice descriptions with adjustable speed and controls")
             FeatureRow(icon: "eye.fill", title: "Visual Mode", description: "High-contrast display for deaf users")
             FeatureRow(icon: "hand.tap.fill", title: "Haptic Mode", description: "Vibration patterns for trends—works without screen")
@@ -107,14 +97,13 @@ struct InfoView: View {
         .background(Color(.systemGray6))
         .cornerRadius(16)
     }
-    
 
     private var howItWorksSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("How It Works")
                 .font(.title2)
                 .fontWeight(.bold)
-            
+
             StepItem(number: 1, text: "Point your camera at any graph, chart, or diagram")
             StepItem(number: 2, text: "StatSense analyzes the image using on-device AI")
             StepItem(number: 3, text: "Receive structured explanations through your preferred mode")
@@ -124,7 +113,6 @@ struct InfoView: View {
         .background(Color(.systemGray6))
         .cornerRadius(16)
     }
-   
 
     private var technicalSection: some View {
         InfoCard(
@@ -138,20 +126,19 @@ struct InfoView: View {
             • Core ML for on-device machine learning
             • Core Haptics for tactile feedback
             • AVSpeechSynthesizer for voice output
-            
+
             No external hardware, no cloud dependency, no institutional systems required.
             """
         )
     }
 }
 
-
 struct InfoCard: View {
     let title: String
     let icon: String
     let iconColor: Color
     let content: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -162,7 +149,7 @@ struct InfoCard: View {
                     .font(.title2)
                     .fontWeight(.bold)
             }
-            
+
             Text(content)
                 .font(.body)
                 .foregroundColor(.secondary)
@@ -174,18 +161,17 @@ struct InfoCard: View {
     }
 }
 
-
 struct FeatureRow: View {
     let icon: String
     let title: String
     let description: String
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
                 .foregroundColor(AccessibleColors.primary)
                 .frame(width: 24)
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.headline)
@@ -197,11 +183,10 @@ struct FeatureRow: View {
     }
 }
 
-
 struct StepItem: View {
     let number: Int
     let text: String
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Text("\(number)")
@@ -210,7 +195,7 @@ struct StepItem: View {
                 .frame(width: 28, height: 28)
                 .background(AccessibleColors.primary)
                 .clipShape(Circle())
-            
+
             Text(text)
                 .font(.body)
         }

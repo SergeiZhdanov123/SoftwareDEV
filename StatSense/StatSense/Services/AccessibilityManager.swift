@@ -3,7 +3,6 @@ import SwiftUI
 import AVFoundation
 import CoreHaptics
 
-
 @MainActor
 class AccessibilityManager: ObservableObject {
     @Published var preferences = UserPreferences() {
@@ -14,19 +13,19 @@ class AccessibilityManager: ObservableObject {
     @Published var isSpeaking = false
     @Published var currentSpeechText = ""
     @Published var hapticEngine: CHHapticEngine?
-    
+
     private let preferencesKey = "com.statsense.preferences"
-    
+
     private var speechSynthesizer = AVSpeechSynthesizer()
     private var speechDelegate: SpeechDelegate?
-    
+
     init() {
         loadPreferences()
         setupHapticEngine()
         speechDelegate = SpeechDelegate(manager: self)
         speechSynthesizer.delegate = speechDelegate
     }
-    
+
     private func savePreferences() {
         do {
             let data = try JSONEncoder().encode(preferences)
@@ -35,7 +34,7 @@ class AccessibilityManager: ObservableObject {
             print("Failed to save preferences: \(error)")
         }
     }
-    
+
     private func loadPreferences() {
         guard let data = UserDefaults.standard.data(forKey: preferencesKey) else { return }
         do {
@@ -44,13 +43,12 @@ class AccessibilityManager: ObservableObject {
             print("Failed to load preferences: \(error)")
         }
     }
-    
 
     func setMode(_ mode: AccessibilityMode) {
         preferences.primaryMode = mode
         announceMode(mode)
     }
-    
+
     private func announceMode(_ mode: AccessibilityMode) {
         if preferences.primaryMode == .audio || preferences.primaryMode == .combined {
             speak("Switched to \(mode.rawValue) mode")
@@ -59,50 +57,48 @@ class AccessibilityManager: ObservableObject {
             playHaptic(.success)
         }
     }
-    
 
     func speak(_ text: String, priority: Bool = false) {
         guard preferences.primaryMode == .audio || preferences.primaryMode == .combined else { return }
-        
+
         if priority {
             speechSynthesizer.stopSpeaking(at: .immediate)
         }
-        
+
         let utterance = AVSpeechUtterance(string: text)
         utterance.rate = preferences.speechSettings.rate
         utterance.pitchMultiplier = preferences.speechSettings.pitch
         utterance.volume = preferences.speechSettings.volume
-        
+
         if let voice = AVSpeechSynthesisVoice(language: preferences.speechSettings.voice) {
             utterance.voice = voice
         }
-        
+
         currentSpeechText = text
         isSpeaking = true
         speechSynthesizer.speak(utterance)
     }
-    
+
     func stopSpeaking() {
         speechSynthesizer.stopSpeaking(at: .immediate)
         isSpeaking = false
     }
-    
+
     func pauseSpeaking() {
         speechSynthesizer.pauseSpeaking(at: .word)
     }
-    
+
     func continueSpeaking() {
         speechSynthesizer.continueSpeaking()
     }
-    
 
     private func setupHapticEngine() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-        
+
         do {
             hapticEngine = try CHHapticEngine()
             try hapticEngine?.start()
-            
+
             hapticEngine?.resetHandler = { [weak self] in
                 do {
                     try self?.hapticEngine?.start()
@@ -114,11 +110,11 @@ class AccessibilityManager: ObservableObject {
             print("Failed to create haptic engine: \(error)")
         }
     }
-    
+
     func playHaptic(_ pattern: ExplanationStep.HapticPattern) {
         guard preferences.hapticSettings.enabled,
               let engine = hapticEngine else { return }
-        
+
         do {
             let events = createHapticEvents(for: pattern)
             let pattern = try CHHapticPattern(events: events, parameters: [])
@@ -128,17 +124,17 @@ class AccessibilityManager: ObservableObject {
             print("Failed to play haptic: \(error)")
         }
     }
-    
+
     private func createHapticEvents(for pattern: ExplanationStep.HapticPattern) -> [CHHapticEvent] {
-        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, 
+        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity,
                                                 value: preferences.hapticSettings.intensity)
         let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
-        
+
         switch pattern {
         case .rising:
             return (0..<5).map { i in
                 CHHapticEvent(eventType: .hapticTransient,
-                             parameters: [CHHapticEventParameter(parameterID: .hapticIntensity, 
+                             parameters: [CHHapticEventParameter(parameterID: .hapticIntensity,
                                                                   value: Float(i + 1) * 0.2),
                                          sharpness],
                              relativeTime: Double(i) * 0.15)
@@ -146,7 +142,7 @@ class AccessibilityManager: ObservableObject {
         case .falling:
             return (0..<5).map { i in
                 CHHapticEvent(eventType: .hapticTransient,
-                             parameters: [CHHapticEventParameter(parameterID: .hapticIntensity, 
+                             parameters: [CHHapticEventParameter(parameterID: .hapticIntensity,
                                                                   value: Float(5 - i) * 0.2),
                                          sharpness],
                              relativeTime: Double(i) * 0.15)

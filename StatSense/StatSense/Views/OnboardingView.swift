@@ -4,7 +4,7 @@ struct OnboardingView: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     @Binding var isPresented: Bool
     @State private var currentPage = 0
-    
+
     private let pages: [OnboardingPage] = [
         OnboardingPage(
             icon: "chart.line.uptrend.xyaxis.circle.fill",
@@ -37,10 +37,10 @@ struct OnboardingView: View {
             color: AccessibleColors.quaternary
         )
     ]
-    
+
     var body: some View {
         VStack(spacing: 0) {
-    
+
             TabView(selection: $currentPage) {
                 ForEach(pages.indices, id: \.self) { index in
                     OnboardingPageView(page: pages[index])
@@ -48,7 +48,7 @@ struct OnboardingView: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            
+
             HStack(spacing: 8) {
                 ForEach(pages.indices, id: \.self) { index in
                     Circle()
@@ -59,8 +59,7 @@ struct OnboardingView: View {
                 }
             }
             .padding(.vertical, 20)
-            
-        
+
             HStack(spacing: 20) {
                 if currentPage > 0 {
                     Button("Previous") {
@@ -70,9 +69,9 @@ struct OnboardingView: View {
                     }
                     .buttonStyle(.bordered)
                 }
-                
+
                 Spacer()
-                
+
                 if currentPage < pages.count - 1 {
                     Button("Next") {
                         withAnimation {
@@ -106,7 +105,6 @@ struct OnboardingView: View {
     }
 }
 
-
 struct OnboardingPage {
     let icon: String
     let title: String
@@ -114,14 +112,13 @@ struct OnboardingPage {
     let color: Color
 }
 
-
 struct OnboardingPageView: View {
     let page: OnboardingPage
-    
+
     var body: some View {
         VStack(spacing: 30) {
             Spacer()
-            
+
             Image(systemName: page.icon)
                 .font(.system(size: 100))
                 .foregroundStyle(
@@ -132,18 +129,18 @@ struct OnboardingPageView: View {
                     )
                 )
                 .accessibilityHidden(true)
-            
+
             Text(page.title)
                 .font(.title)
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
-            
+
             Text(page.description)
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-            
+
             Spacer()
             Spacer()
         }

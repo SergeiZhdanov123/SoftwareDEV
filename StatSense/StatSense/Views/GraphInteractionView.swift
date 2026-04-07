@@ -1,14 +1,13 @@
 import SwiftUI
 
-
 struct GraphInteractionView: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     @Environment(\.dismiss) private var dismiss
-    
+
     let result: InterpretationResult
     @State private var selectedRegion: GraphRegion?
     @State private var regions: [GraphRegion] = []
-    
+
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
@@ -20,7 +19,6 @@ struct GraphInteractionView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    
 
                     ForEach(regions) { region in
                         RegionOverlay(
@@ -54,17 +52,16 @@ struct GraphInteractionView: View {
             }
         }
     }
-    
 
     private var instructionsPanel: some View {
         VStack(spacing: 12) {
             Image(systemName: "hand.tap.fill")
                 .font(.title)
                 .foregroundColor(AccessibleColors.primary)
-            
+
             Text("Tap any area of the graph to explore")
                 .font(.headline)
-            
+
             Text("Each tap will describe that section with audio and haptic feedback")
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -76,11 +73,9 @@ struct GraphInteractionView: View {
         .cornerRadius(16, corners: [.topLeft, .topRight])
         .shadow(radius: 10)
     }
-    
 
     private func generateRegions() {
         var newRegions: [GraphRegion] = []
-        
 
         if let xAxis = result.xAxis {
             newRegions.append(GraphRegion(
@@ -91,7 +86,6 @@ struct GraphInteractionView: View {
                 hapticPattern: .steady
             ))
         }
-        
 
         if let yAxis = result.yAxis {
             newRegions.append(GraphRegion(
@@ -102,7 +96,6 @@ struct GraphInteractionView: View {
                 hapticPattern: .steady
             ))
         }
-        
 
         for (index, line) in result.dataLines.enumerated() {
             let yOffset = 0.2 + Double(index) * 0.15
@@ -113,7 +106,7 @@ struct GraphInteractionView: View {
                 default: return .steady
                 }
             }()
-            
+
             newRegions.append(GraphRegion(
                 name: line.label ?? "Data Line \(index + 1)",
                 bounds: CGRect(x: 0.15, y: yOffset, width: 0.7, height: 0.2),
@@ -122,7 +115,6 @@ struct GraphInteractionView: View {
                 hapticPattern: haptic
             ))
         }
-        
 
         for (index, intersection) in result.intersections.enumerated() {
             newRegions.append(GraphRegion(
@@ -133,10 +125,9 @@ struct GraphInteractionView: View {
                 hapticPattern: .intersection
             ))
         }
-        
+
         regions = newRegions
     }
-
 
     private func selectRegion(_ region: GraphRegion) {
         selectedRegion = region
@@ -145,12 +136,11 @@ struct GraphInteractionView: View {
     }
 }
 
-
 struct RegionOverlay: View {
     let region: GraphRegion
     let isSelected: Bool
     let imageSize: CGSize
-    
+
     var body: some View {
         Rectangle()
             .fill(isSelected ? AccessibleColors.primary.opacity(0.3) : Color.clear)
@@ -168,30 +158,29 @@ struct RegionOverlay: View {
     }
 }
 
-
 struct RegionInfoPanel: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let region: GraphRegion
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: iconForType(region.type))
                     .font(.title2)
                     .foregroundColor(AccessibleColors.primary)
-                
+
                 Text(region.name)
                     .font(.headline)
-                
+
                 Spacer()
-                
+
                 Button(action: { accessibilityManager.speak(region.explanation, priority: true) }) {
                     Image(systemName: "speaker.wave.2.fill")
                         .foregroundColor(AccessibleColors.primary)
                 }
                 .accessibilityLabel("Read aloud")
             }
-            
+
             Text(region.explanation)
                 .font(.body)
                 .foregroundColor(.secondary)
@@ -202,7 +191,7 @@ struct RegionInfoPanel: View {
         .cornerRadius(16, corners: [.topLeft, .topRight])
         .shadow(radius: 10)
     }
-    
+
     private func iconForType(_ type: GraphRegion.RegionType) -> String {
         switch type {
         case .xAxis: return "arrow.left.and.right"
@@ -217,7 +206,6 @@ struct RegionInfoPanel: View {
     }
 }
 
-
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
         clipShape(RoundedCorner(radius: radius, corners: corners))
@@ -227,7 +215,7 @@ extension View {
 struct RoundedCorner: Shape {
     var radius: CGFloat = .infinity
     var corners: UIRectCorner = .allCorners
-    
+
     func path(in rect: CGRect) -> Path {
         let path = UIBezierPath(
             roundedRect: rect,

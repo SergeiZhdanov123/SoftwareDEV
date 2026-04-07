@@ -2,13 +2,11 @@ import Foundation
 import UIKit
 import Vision
 
-
 class ImageAnalyzer {
-    
- 
+
     func recognizeText(in image: UIImage) async -> [RecognizedTextBlock] {
         guard let cgImage = image.cgImage else { return [] }
-        
+
         return await withCheckedContinuation { continuation in
             let request = VNRecognizeTextRequest { request, error in
                 guard error == nil,
@@ -16,7 +14,7 @@ class ImageAnalyzer {
                     continuation.resume(returning: [])
                     return
                 }
-                
+
                 let blocks = observations.compactMap { observation -> RecognizedTextBlock? in
                     guard let candidate = observation.topCandidates(1).first else { return nil }
                     return RecognizedTextBlock(
@@ -25,15 +23,15 @@ class ImageAnalyzer {
                         boundingBox: observation.boundingBox
                     )
                 }
-                
+
                 continuation.resume(returning: blocks)
             }
-            
+
             request.recognitionLevel = .accurate
             request.usesLanguageCorrection = true
-            
+
             let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            
+
             do {
                 try handler.perform([request])
             } catch {
@@ -45,7 +43,7 @@ class ImageAnalyzer {
 
     func detectRectangles(in image: UIImage) async -> [CGRect] {
         guard let cgImage = image.cgImage else { return [] }
-        
+
         return await withCheckedContinuation { continuation in
             let request = VNDetectRectanglesRequest { request, error in
                 guard error == nil,
@@ -53,7 +51,7 @@ class ImageAnalyzer {
                     continuation.resume(returning: [])
                     return
                 }
-                
+
                 let rects = observations.map { observation in
                     CGRect(
                         x: observation.boundingBox.origin.x,
@@ -62,17 +60,17 @@ class ImageAnalyzer {
                         height: observation.boundingBox.height
                     )
                 }
-                
+
                 continuation.resume(returning: rects)
             }
-            
+
             request.minimumAspectRatio = 0.3
             request.maximumAspectRatio = 3.0
             request.minimumSize = 0.1
             request.minimumConfidence = 0.5
-            
+
             let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            
+
             do {
                 try handler.perform([request])
             } catch {
@@ -81,7 +79,6 @@ class ImageAnalyzer {
             }
         }
     }
-    
 
     func detectContours(in image: UIImage) async -> [VNContour] {
         guard let cgImage = image.cgImage else { return [] }
@@ -94,7 +91,6 @@ class ImageAnalyzer {
                     continuation.resume(returning: [])
                     return
                 }
-
 
                 let contours = (0..<observation.topLevelContourCount).compactMap { index -> VNContour? in
                     try? observation.topLevelContours[index]
@@ -118,21 +114,19 @@ class ImageAnalyzer {
     }
 }
 
-
 struct RecognizedTextBlock {
     let text: String
     let confidence: Float
     let boundingBox: CGRect
-    
+
     var isNumber: Bool {
         Double(text.replacingOccurrences(of: ",", with: "")) != nil
     }
-    
+
     var numericValue: Double? {
         Double(text.replacingOccurrences(of: ",", with: ""))
     }
 }
-
 
 enum AnalysisError: Error, LocalizedError {
     case preprocessingFailed
@@ -141,7 +135,7 @@ enum AnalysisError: Error, LocalizedError {
     case lowConfidence
     case unsupportedGraphType
     case invalidResponse
-    
+
     var errorDescription: String? {
         switch self {
         case .preprocessingFailed: return "Could not optimize image for AI analysis."

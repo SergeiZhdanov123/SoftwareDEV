@@ -4,13 +4,13 @@ struct ContentView: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     @EnvironmentObject var graphAnalyzer: GraphAnalyzer
     @State private var selectedTab: Tab = .capture
-    
+
     enum Tab: String, CaseIterable {
         case capture = "Capture"
         case history = "History"
         case settings = "Settings"
         case info = "Info"
-        
+
         var icon: String {
             switch self {
             case .capture: return "camera.fill"
@@ -20,7 +20,7 @@ struct ContentView: View {
             }
         }
     }
-    
+
     var body: some View {
         TabView(selection: $selectedTab) {
             CaptureView()
@@ -28,19 +28,19 @@ struct ContentView: View {
                     Label(Tab.capture.rawValue, systemImage: Tab.capture.icon)
                 }
                 .tag(Tab.capture)
-            
+
             HistoryView()
                 .tabItem {
                     Label(Tab.history.rawValue, systemImage: Tab.history.icon)
                 }
                 .tag(Tab.history)
-            
+
             SettingsView()
                 .tabItem {
                     Label(Tab.settings.rawValue, systemImage: Tab.settings.icon)
                 }
                 .tag(Tab.settings)
-            
+
             InfoView()
                 .tabItem {
                     Label(Tab.info.rawValue, systemImage: Tab.info.icon)
@@ -54,7 +54,6 @@ struct ContentView: View {
         }
     }
 }
-
 
 #Preview {
     ContentView()

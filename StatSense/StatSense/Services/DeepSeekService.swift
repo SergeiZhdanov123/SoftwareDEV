@@ -12,35 +12,31 @@ class DeepSeekService {
         return key
     }
     private let url = URL(string: "https://api.deepseek.com/chat/completions")!
-    
-    // Note: DeepSeek doesn't natively support full image/vision analysis via API in the same way OpenAI does currently.
-    // However, they *do* support textual analysis. So we use Apple Vision to extract the text & contours,
-    // and feed that text to DeepSeek to generate the complex ExplanationSteps and interpretation JSON.
+
     func analyzeGraphData(textFromImage: String, axisX: String, axisY: String, detectedContours: String) async throws -> InterpretationResult {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        // DeepSeek v3 (deepseek-chat) is excellent at JSON if given a precise schema.
+
         let prompt = """
         ACT AS: A world-class Accessibility Graph Interpreter for blind users.
         TASK: Convert messy OCR and Vision contour data into a structured InterpretationResult JSON.
-        
+
         INPUT DATA:
         - OCR Text: "\(textFromImage)"
         - X-Axis: "\(axisX)"
         - Y-Axis: "\(axisY)"
         - Vision Segments: "\(detectedContours)"
-        
-        OUTPUT REQUIREMENT: Return a valid JSON object matching our schema. Do NOT include any markdown formatting like ```json. 
+
+        OUTPUT REQUIREMENT: Return a valid JSON object matching our schema. Do NOT include any markdown formatting like ```json.
         Return ONLY the raw JSON.
-        
+
         CRITICAL FORMATTING RULES:
         1. NUMBERS MUST NOT BE IN QUOTES (e.g., "confidence": 0.9, NOT "0.9").
         2. MISSING DATA: If no lines are found, return an empty array [] for "dataLines", NO NOT RETURN null.
         3. AXIS: If axis labels are missing, provide a generic label like "Value" and default range [0, 100].
-        
+
         JSON SCHEMA & ALLOWED VALUES:
         {
           "graphType": "Line Graph" | "Bar Chart" | "Scatter Plot" | "Pie Chart" | "Diagram" | "Whiteboard" | "Unknown",
@@ -71,13 +67,13 @@ class DeepSeekService {
             "hapticPattern": "none" | "rising" | "falling" | "steady" | "intersection" | "attention" | "success"
           }]
         }
-        
+
         CRITICAL:
         1. "explanations" must be a narrative for a blind user.
         2. Ensure "hapticPattern" values are lowercase and match EXACTLY: "none", "rising", "falling", "steady", "intersection", "attention", "success".
         3. All trend and slope values must be EXACT capitalized strings as shown above.
         """
-        
+
         let parameters: [String: Any] = [
             "model": "deepseek-chat",
             "messages": [
@@ -87,33 +83,32 @@ class DeepSeekService {
             "temperature": 0.3,
             "response_format": ["type": "json_object"]
         ]
-        
+
         urlRequest.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
-        
+
         let (data, response) = try await URLSession.shared.data(for: urlRequest)
-        
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
         }
-        
+
         if httpResponse.statusCode == 401 {
             throw NSError(domain: "DeepSeek", code: 401, userInfo: [NSLocalizedDescriptionKey: "Invalid API Key. Please check your Info.plist."])
         }
-        
+
         if httpResponse.statusCode == 402 {
             throw NSError(domain: "DeepSeek", code: 402, userInfo: [NSLocalizedDescriptionKey: "Insufficient Balance or Unpaid API Key."])
         }
-        
+
         if httpResponse.statusCode != 200 {
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown"
             print("DEEPSEEK API ERROR (\(httpResponse.statusCode)): \(errorBody)")
             throw URLError(.badServerResponse)
         }
-        
+
         let jsonResponse = try JSONDecoder().decode(DeepSeekResponse.self, from: data)
         let jsonContent = jsonResponse.choices.first?.message.content ?? "{}"
-        
-        // Comprehensive clean up: strip leading/trailing whitespace, markdown blocks, etc.
+
         var cleanedJSON = jsonContent.trimmingCharacters(in: .whitespacesAndNewlines)
         if cleanedJSON.hasPrefix("```") {
             let lines = cleanedJSON.components(separatedBy: .newlines)
@@ -121,19 +116,17 @@ class DeepSeekService {
                 cleanedJSON = lines.dropFirst().dropLast().joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
             }
         }
-        
-        // Remove trailing commas which frequently break JSONDecoder
-        // Matches a comma followed by closing brace or bracket, potentially with whitespace
+
         let regex = try? NSRegularExpression(pattern: ",\\s*([\\}\\]])", options: [])
         cleanedJSON = regex?.stringByReplacingMatches(in: cleanedJSON, options: [], range: NSRange(location: 0, length: cleanedJSON.utf16.count), withTemplate: "$1") ?? cleanedJSON
-        
+
         guard let resultData = cleanedJSON.data(using: .utf8) else {
             throw AnalysisError.invalidResponse
         }
-        
+
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        
+
         do {
             let result = try decoder.decode(InterpretationResult.self, from: resultData)
             return result
@@ -161,14 +154,13 @@ class DeepSeekService {
     }
 }
 
-
 struct DeepSeekResponse: Codable {
     let choices: [Choice]
-    
+
     struct Choice: Codable {
         let message: Message
     }
-    
+
     struct Message: Codable {
         let content: String
     }

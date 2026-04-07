@@ -1,7 +1,6 @@
 import Foundation
 import UIKit
 
-
 struct InterpretationResult: Identifiable, Equatable, Codable {
     var id = UUID()
     var graphType: GraphType
@@ -11,16 +10,16 @@ struct InterpretationResult: Identifiable, Equatable, Codable {
     var dataLines: [DataLine]
     var intersections: [IntersectionPoint]
     var overallTrend: TrendType
-    var confidence: Double 
+    var confidence: Double
     var warnings: [String]
     var explanations: [ExplanationStep]
     var capturedImage: UIImage?
     var timestamp: Date
-    
+
     enum CodingKeys: String, CodingKey {
         case id, graphType, title, xAxis, yAxis, dataLines, intersections, overallTrend, confidence, warnings, explanations, timestamp
     }
-    
+
     init(id: UUID = UUID(), graphType: GraphType, title: String, xAxis: AxisInfo? = nil, yAxis: AxisInfo? = nil, dataLines: [DataLine], intersections: [IntersectionPoint], overallTrend: TrendType, confidence: Double, warnings: [String], explanations: [ExplanationStep], capturedImage: UIImage? = nil, timestamp: Date) {
         self.id = id
         self.graphType = graphType
@@ -36,7 +35,7 @@ struct InterpretationResult: Identifiable, Equatable, Codable {
         self.capturedImage = capturedImage
         self.timestamp = timestamp
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
@@ -53,7 +52,7 @@ struct InterpretationResult: Identifiable, Equatable, Codable {
         timestamp = try container.decodeIfPresent(Date.self, forKey: .timestamp) ?? Date()
         capturedImage = nil
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
@@ -69,14 +68,14 @@ struct InterpretationResult: Identifiable, Equatable, Codable {
         try container.encode(explanations, forKey: .explanations)
         try container.encode(timestamp, forKey: .timestamp)
     }
-    
+
     static func == (lhs: InterpretationResult, rhs: InterpretationResult) -> Bool {
         lhs.id == rhs.id
     }
-    
+
     var isReliable: Bool { confidence >= 0.7 }
     var isLowConfidence: Bool { confidence < 0.5 }
-    
+
     var confidenceDescription: String {
         switch confidence {
         case 0.9...: return "Very High Confidence"
@@ -86,28 +85,27 @@ struct InterpretationResult: Identifiable, Equatable, Codable {
         default: return "Very Low Confidence"
         }
     }
-    
+
     var summary: String {
         var parts: [String] = []
         parts.append("This is a \(graphType.rawValue).")
-        
+
         if let xAxis = xAxis {
             parts.append(xAxis.description + ".")
         }
         if let yAxis = yAxis {
             parts.append(yAxis.description + ".")
         }
-        
+
         parts.append("The overall trend is \(overallTrend.description.lowercased()).")
-        
+
         if !intersections.isEmpty {
             parts.append("There are \(intersections.count) intersection point(s).")
         }
-        
+
         return parts.joined(separator: " ")
     }
 }
-
 
 struct DataLine: Identifiable, Equatable, Codable {
     var id: UUID
@@ -117,11 +115,11 @@ struct DataLine: Identifiable, Equatable, Codable {
     var segments: [LineSegment]
     var trend: TrendType
     var averageSlope: SlopeClassification
-    
+
     enum CodingKeys: String, CodingKey {
         case id, label, color, points, segments, trend, averageSlope
     }
-    
+
     init(id: UUID = UUID(), label: String? = nil, color: String? = nil, points: [DataPoint] = [], segments: [LineSegment] = [], trend: TrendType = .constant, averageSlope: SlopeClassification = .flat) {
         self.id = id
         self.label = label
@@ -131,7 +129,7 @@ struct DataLine: Identifiable, Equatable, Codable {
         self.trend = trend
         self.averageSlope = averageSlope
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
@@ -142,7 +140,7 @@ struct DataLine: Identifiable, Equatable, Codable {
         trend = try container.decode(TrendType.self, forKey: .trend)
         averageSlope = try container.decode(SlopeClassification.self, forKey: .averageSlope)
     }
-    
+
     var description: String {
         var desc = label ?? "A line"
         desc += " shows \(trend.description.lowercased())"
@@ -151,20 +149,19 @@ struct DataLine: Identifiable, Equatable, Codable {
     }
 }
 
-
 struct ExplanationStep: Identifiable, Equatable, Codable {
     var id: UUID
     var order: Int
     var title: String
     var description: String
-    var region: CGRect? 
+    var region: CGRect?
     var trend: TrendType?
     var hapticPattern: HapticPattern
-    
+
     enum CodingKeys: String, CodingKey {
         case id, order, title, description, region, trend, hapticPattern
     }
-    
+
     init(id: UUID = UUID(), order: Int, title: String, description: String, region: CGRect? = nil, trend: TrendType? = nil, hapticPattern: HapticPattern = .none) {
         self.id = id
         self.order = order
@@ -174,7 +171,7 @@ struct ExplanationStep: Identifiable, Equatable, Codable {
         self.trend = trend
         self.hapticPattern = hapticPattern
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
@@ -185,18 +182,17 @@ struct ExplanationStep: Identifiable, Equatable, Codable {
         trend = try container.decodeIfPresent(TrendType.self, forKey: .trend)
         hapticPattern = try container.decode(HapticPattern.self, forKey: .hapticPattern)
     }
-    
+
     enum HapticPattern: String, Equatable, Codable {
         case none
-        case rising     
-        case falling     
-        case steady      
-        case intersection 
-        case attention   
-        case success    
+        case rising
+        case falling
+        case steady
+        case intersection
+        case attention
+        case success
     }
 }
-
 
 struct GraphRegion: Identifiable {
     let id = UUID()
@@ -205,7 +201,7 @@ struct GraphRegion: Identifiable {
     var type: RegionType
     var explanation: String
     var hapticPattern: ExplanationStep.HapticPattern
-    
+
     enum RegionType {
         case xAxis
         case yAxis
@@ -218,15 +214,14 @@ struct GraphRegion: Identifiable {
     }
 }
 
-
 struct DemoGraph: Identifiable {
     let id = UUID()
     var name: String
     var description: String
-    var image: String 
+    var image: String
     var precomputedResult: InterpretationResult
     var difficulty: Difficulty
-    
+
     enum Difficulty: String, CaseIterable {
         case beginner = "Beginner"
         case intermediate = "Intermediate"

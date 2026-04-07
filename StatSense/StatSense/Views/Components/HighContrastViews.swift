@@ -1,17 +1,15 @@
 import SwiftUI
 
-
 struct HighContrastResultCard: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let result: InterpretationResult
-    
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
 
             HStack {
                 TrendIconView(trend: result.overallTrend, size: 64)
-                
+
                 VStack(alignment: .leading) {
                     Text(result.graphType.rawValue)
                         .font(.title2.bold())
@@ -19,24 +17,22 @@ struct HighContrastResultCard: View {
                         .font(.headline)
                 }
             }
-            
+
             Divider()
                 .background(AccessibleColors.highContrastAccent)
-            
 
             ForEach(result.explanations.prefix(5)) { step in
                 HighContrastStepView(step: step)
             }
-            
 
             ConfidenceBarView(confidence: result.confidence)
         }
         .padding()
-        .background(accessibilityManager.preferences.visualSettings.useHighContrast 
-                    ? AccessibleColors.highContrastBackground 
+        .background(accessibilityManager.preferences.visualSettings.useHighContrast
+                    ? AccessibleColors.highContrastBackground
                     : Color(.systemBackground))
-        .foregroundColor(accessibilityManager.preferences.visualSettings.useHighContrast 
-                         ? AccessibleColors.highContrastText 
+        .foregroundColor(accessibilityManager.preferences.visualSettings.useHighContrast
+                         ? AccessibleColors.highContrastText
                          : .primary)
         .cornerRadius(16)
     }
@@ -44,10 +40,10 @@ struct HighContrastResultCard: View {
 
 struct HighContrastStepView: View {
     let step: ExplanationStep
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
-            // Trend icon if available
+
             if let trend = step.trend {
                 TrendIconView(trend: trend, size: 32)
             } else {
@@ -55,7 +51,7 @@ struct HighContrastStepView: View {
                     .font(.title2)
                     .foregroundColor(AccessibleColors.primary)
             }
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(step.title)
                     .font(.headline.weight(.semibold))
@@ -68,11 +64,10 @@ struct HighContrastStepView: View {
     }
 }
 
-
 struct ConfidenceBarView: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let confidence: Double
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -83,14 +78,14 @@ struct ConfidenceBarView: View {
                     .font(.headline)
                     .foregroundColor(confidenceColor)
             }
-            
+
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
                         .frame(height: 12)
                         .cornerRadius(6)
-                    
+
                     Rectangle()
                         .fill(confidenceColor)
                         .frame(width: geometry.size.width * confidence, height: 12)
@@ -103,11 +98,11 @@ struct ConfidenceBarView: View {
         .background(Color(.systemGray6))
         .cornerRadius(12)
     }
-    
+
     private var mode: VisualSettings.ColorBlindMode {
         accessibilityManager.preferences.visualSettings.colorBlindMode
     }
-    
+
     private var confidenceColor: Color {
         switch confidence {
         case 0.8...: return AccessibleColors.success(mode: mode)
@@ -117,16 +112,15 @@ struct ConfidenceBarView: View {
     }
 }
 
-
 struct LargeAccessibleButtonStyle: ButtonStyle {
     let backgroundColor: Color
     let foregroundColor: Color
-    
+
     init(backgroundColor: Color = AccessibleColors.primary, foregroundColor: Color = .white) {
         self.backgroundColor = backgroundColor
         self.foregroundColor = foregroundColor
     }
-    
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.title2.weight(.semibold))
@@ -140,12 +134,11 @@ struct LargeAccessibleButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Accessible Icon Button
 struct AccessibleIconButton: View {
     let icon: String
     let label: String
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             VStack(spacing: 8) {

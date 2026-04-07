@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AccessibilityModeIndicator: View {
     let mode: AccessibilityMode
-    
+
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: mode.icon)
@@ -18,7 +18,7 @@ struct AccessibilityModeIndicator: View {
         .clipShape(Capsule())
         .accessibilityLabel("Current mode: \(mode.rawValue)")
     }
-    
+
     private var modeColor: Color {
         switch mode {
         case .audio: return AccessibleColors.primary
@@ -29,11 +29,10 @@ struct AccessibilityModeIndicator: View {
     }
 }
 
-
 struct ModeSwitcherButton: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     @State private var showingModeSheet = false
-    
+
     var body: some View {
         Button(action: { showingModeSheet = true }) {
             Image(systemName: "switch.2")
@@ -50,11 +49,10 @@ struct ModeSwitcherButton: View {
     }
 }
 
-
 struct ModeSelectorSheet: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         NavigationStack {
             List {
@@ -68,7 +66,7 @@ struct ModeSelectorSheet: View {
                                 .font(.title2)
                                 .foregroundColor(AccessibleColors.primary)
                                 .frame(width: 40)
-                            
+
                             VStack(alignment: .leading) {
                                 Text(mode.rawValue)
                                     .font(.headline)
@@ -77,9 +75,9 @@ struct ModeSelectorSheet: View {
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
-                            
+
                             Spacer()
-                            
+
                             if accessibilityManager.preferences.primaryMode == mode {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(AccessibleColors.success)
@@ -101,17 +99,16 @@ struct ModeSelectorSheet: View {
     }
 }
 
-
 struct TrendIconView: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let trend: TrendType
     let size: CGFloat
-    
+
     init(trend: TrendType, size: CGFloat = 24) {
         self.trend = trend
         self.size = size
     }
-    
+
     var body: some View {
         Text(trend.icon)
             .font(.system(size: size, weight: .bold))
@@ -120,11 +117,10 @@ struct TrendIconView: View {
     }
 }
 
-
 struct ConfidenceIndicator: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let confidence: Double
-    
+
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: confidenceIcon)
@@ -138,7 +134,7 @@ struct ConfidenceIndicator: View {
         .background(confidenceColor.opacity(0.2))
         .clipShape(Capsule())
     }
-    
+
     private var confidenceIcon: String {
         switch confidence {
         case 0.8...: return "checkmark.shield.fill"
@@ -146,7 +142,7 @@ struct ConfidenceIndicator: View {
         default: return "xmark.shield.fill"
         }
     }
-    
+
     private var confidenceColor: Color {
         let mode = accessibilityManager.preferences.visualSettings.colorBlindMode
         switch confidence {
@@ -162,13 +158,13 @@ struct ConfidenceIndicator: View {
         AccessibilityModeIndicator(mode: .audio)
         AccessibilityModeIndicator(mode: .visual)
         AccessibilityModeIndicator(mode: .haptic)
-        
+
         HStack {
             TrendIconView(trend: .increasing)
             TrendIconView(trend: .decreasing)
             TrendIconView(trend: .constant)
         }
-        
+
         ConfidenceIndicator(confidence: 0.85)
         ConfidenceIndicator(confidence: 0.6)
         ConfidenceIndicator(confidence: 0.3)

@@ -3,11 +3,11 @@ import SwiftUI
 struct ResultsView: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     @Environment(\.dismiss) private var dismiss
-    
+
     let result: InterpretationResult
     @State private var currentStepIndex = 0
     @State private var isExploring = false
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -18,22 +18,21 @@ struct ResultsView: View {
                         if let image = result.capturedImage {
                             ImagePreviewCard(image: image)
                         }
-                        
+
                         headerSection
-                        
+
                         SummaryCard(result: result)
-                        
+
                         explanationSection
                     }
-                    
+
                     if isExploring {
                         StepByStepExplorer(
                             steps: result.explanations,
                             currentIndex: $currentStepIndex
                         )
                     }
-                    
-               
+
                     actionButtons
                 }
                 .padding()
@@ -57,64 +56,60 @@ struct ResultsView: View {
             }
         }
     }
-    
+
     private var headerSection: some View {
         VStack(spacing: 12) {
             HStack {
-       
+
                 Label(result.graphType.rawValue, systemImage: result.graphType.icon)
                     .font(.body.bold())
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                     .background(AccessibleColors.primary.opacity(0.2))
                     .clipShape(Capsule())
-                
+
                 Spacer()
-                
 
                 ConfidenceIndicator(confidence: result.confidence)
             }
-            
-            
+
             if !result.warnings.isEmpty {
                 WarningsCard(warnings: result.warnings)
             }
         }
     }
-    
-    
+
     private var explanationSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Detailed Explanation")
                     .font(.title2)
                     .fontWeight(.bold)
-                
+
                 Spacer()
-                
-                Button(action: { 
+
+                Button(action: {
                     isExploring.toggle()
                     if isExploring {
                         accessibilityManager.speak("Step by step mode activated. Tap next to explore each part.")
                     }
                 }) {
-                    Label(isExploring ? "Exit Explore" : "Step-by-Step", 
+                    Label(isExploring ? "Exit Explore" : "Step-by-Step",
                           systemImage: isExploring ? "xmark.circle" : "hand.tap")
                         .font(.subheadline)
                 }
                 .buttonStyle(.bordered)
             }
-            
+
             ForEach(result.explanations) { step in
                 ExplanationStepCard(step: step)
             }
         }
     }
-    
-    
+
     private var actionButtons: some View {
         VStack(spacing: 12) {
-    
+
             Button(action: readAloud) {
                 Label(
                     accessibilityManager.isSpeaking ? "Stop Reading" : "Read Aloud",
@@ -124,8 +119,7 @@ struct ResultsView: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(AccessibleColors.primary)
-            
-       
+
             Button(action: playHapticSummary) {
                 Label("Feel Trend Pattern", systemImage: "hand.tap.fill")
                     .frame(maxWidth: .infinity)
@@ -134,7 +128,6 @@ struct ResultsView: View {
         }
         .padding(.top)
     }
-    
 
     private func readAloud() {
         if accessibilityManager.isSpeaking {
@@ -144,7 +137,7 @@ struct ResultsView: View {
             accessibilityManager.speak(fullText, priority: true)
         }
     }
-    
+
     private func playHapticSummary() {
         let pattern: ExplanationStep.HapticPattern = {
             switch result.overallTrend {
@@ -155,12 +148,12 @@ struct ResultsView: View {
         }()
         accessibilityManager.playHaptic(pattern)
     }
-    
+
     private func shareResult() {
-       
+
         let text = result.summary
         let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-        
+
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first,
            let rootVC = window.rootViewController {
@@ -169,10 +162,9 @@ struct ResultsView: View {
     }
 }
 
-
 struct ImagePreviewCard: View {
     let image: UIImage
-    
+
     var body: some View {
         Image(uiImage: image)
             .resizable()
@@ -183,11 +175,10 @@ struct ImagePreviewCard: View {
     }
 }
 
-
 struct SummaryCard: View {
     @EnvironmentObject var accessibilityManager: AccessibilityManager
     let result: InterpretationResult
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -196,7 +187,7 @@ struct SummaryCard: View {
                 Spacer()
                 TrendIconView(trend: result.overallTrend, size: 32)
             }
-            
+
             Text(result.summary)
                 .font(.body)
                 .foregroundColor(.secondary)

@@ -1,7 +1,6 @@
 import Foundation
 import CoreGraphics
 
-
 enum GraphType: String, CaseIterable, Identifiable, Codable {
     case lineGraph = "Line Graph"
     case barChart = "Bar Chart"
@@ -10,9 +9,9 @@ enum GraphType: String, CaseIterable, Identifiable, Codable {
     case diagram = "Diagram"
     case whiteboard = "Whiteboard"
     case unknown = "Unknown"
-    
+
     var id: String { rawValue }
-    
+
     var icon: String {
         switch self {
         case .lineGraph: return "chart.line.uptrend.xyaxis"
@@ -26,7 +25,6 @@ enum GraphType: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-
 enum TrendType: String, CaseIterable, Codable {
     case increasing = "Increasing"
     case decreasing = "Decreasing"
@@ -34,7 +32,7 @@ enum TrendType: String, CaseIterable, Codable {
     case fluctuating = "Fluctuating"
     case exponential = "Exponential"
     case logarithmic = "Logarithmic"
-    
+
     var icon: String {
         switch self {
         case .increasing: return "↑"
@@ -45,7 +43,7 @@ enum TrendType: String, CaseIterable, Codable {
         case .logarithmic: return "⤵"
         }
     }
-    
+
     var description: String {
         switch self {
         case .increasing: return "Values are rising"
@@ -58,7 +56,6 @@ enum TrendType: String, CaseIterable, Codable {
     }
 }
 
-
 enum SlopeClassification: String, Codable {
     case steepPositive = "Steep Positive"
     case moderatePositive = "Moderate Positive"
@@ -67,7 +64,7 @@ enum SlopeClassification: String, Codable {
     case gentleNegative = "Gentle Negative"
     case moderateNegative = "Moderate Negative"
     case steepNegative = "Steep Negative"
-    
+
     var description: String {
         switch self {
         case .steepPositive: return "The slope is positive and steep"
@@ -79,7 +76,7 @@ enum SlopeClassification: String, Codable {
         case .steepNegative: return "The slope is negative and steep"
         }
     }
-    
+
     static func from(angle: Double) -> SlopeClassification {
         let degrees = angle * 180 / .pi
         switch degrees {
@@ -94,24 +91,23 @@ enum SlopeClassification: String, Codable {
     }
 }
 
-
 struct DataPoint: Identifiable, Equatable, Codable {
     var id: UUID
     var x: Double
     var y: Double
     var label: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case id, x, y, label
     }
-    
+
     init(id: UUID = UUID(), x: Double, y: Double, label: String? = nil) {
         self.id = id
         self.x = x
         self.y = y
         self.label = label
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
@@ -119,12 +115,11 @@ struct DataPoint: Identifiable, Equatable, Codable {
         y = try container.decode(Double.self, forKey: .y)
         label = try container.decodeIfPresent(String.self, forKey: .label)
     }
-    
+
     var cgPoint: CGPoint {
         CGPoint(x: x, y: y)
     }
 }
-
 
 struct AxisInfo: Equatable, Codable {
     var label: String
@@ -132,9 +127,9 @@ struct AxisInfo: Equatable, Codable {
     var maxValue: Double
     var scale: String
     var unit: String?
-    
+
     var range: Double { maxValue - minValue }
-    
+
     var description: String {
         var desc = "\(label) axis ranges from \(formatValue(minValue)) to \(formatValue(maxValue))"
         if let unit = unit {
@@ -142,7 +137,7 @@ struct AxisInfo: Equatable, Codable {
         }
         return desc
     }
-    
+
     private func formatValue(_ value: Double) -> String {
         if value == floor(value) {
             return String(format: "%.0f", value)
@@ -151,18 +146,17 @@ struct AxisInfo: Equatable, Codable {
     }
 }
 
-
 struct LineSegment: Identifiable, Equatable, Codable {
     var id: UUID
     var startPoint: DataPoint
     var endPoint: DataPoint
     var trend: TrendType
     var slope: SlopeClassification
-    
+
     enum CodingKeys: String, CodingKey {
         case id, startPoint, endPoint, trend, slope
     }
-    
+
     init(id: UUID = UUID(), startPoint: DataPoint, endPoint: DataPoint, trend: TrendType, slope: SlopeClassification) {
         self.id = id
         self.startPoint = startPoint
@@ -170,7 +164,7 @@ struct LineSegment: Identifiable, Equatable, Codable {
         self.trend = trend
         self.slope = slope
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
@@ -179,7 +173,7 @@ struct LineSegment: Identifiable, Equatable, Codable {
         trend = try container.decode(TrendType.self, forKey: .trend)
         slope = try container.decode(SlopeClassification.self, forKey: .slope)
     }
-    
+
     var description: String {
         "From (\(startPoint.x), \(startPoint.y)) to (\(endPoint.x), \(endPoint.y)): \(slope.description)"
     }
@@ -190,18 +184,18 @@ struct IntersectionPoint: Identifiable, Equatable, Codable {
     var point: DataPoint
     var line1Index: Int
     var line2Index: Int
-    
+
     enum CodingKeys: String, CodingKey {
         case id, point, line1Index, line2Index
     }
-    
+
     init(id: UUID = UUID(), point: DataPoint, line1Index: Int, line2Index: Int) {
         self.id = id
         self.point = point
         self.line1Index = line1Index
         self.line2Index = line2Index
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
@@ -209,7 +203,7 @@ struct IntersectionPoint: Identifiable, Equatable, Codable {
         line1Index = try container.decode(Int.self, forKey: .line1Index)
         line2Index = try container.decode(Int.self, forKey: .line2Index)
     }
-    
+
     var description: String {
         "Lines intersect at approximately x = \(String(format: "%.1f", point.x)), y = \(String(format: "%.1f", point.y))"
     }

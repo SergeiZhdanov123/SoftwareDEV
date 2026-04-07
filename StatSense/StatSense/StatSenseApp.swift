@@ -5,7 +5,7 @@ import SwiftData
 struct StatSenseApp: App {
     @StateObject private var accessibilityManager = AccessibilityManager()
     @StateObject private var graphAnalyzer = GraphAnalyzer()
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()

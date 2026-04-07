@@ -4,9 +4,9 @@ import SwiftData
 struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \SavedGraph.timestamp, order: .reverse) private var savedGraphs: [SavedGraph]
-    
+
     @State private var selectedResult: InterpretationResult?
-    
+
     var body: some View {
         NavigationStack {
             Group {
@@ -27,7 +27,7 @@ struct HistoryView: View {
                         ForEach(savedGraphs) { graph in
                             Button(action: {
                                 if let result = graph.interpretationResult {
-                                    // Make sure we attach the image to the result for display
+
                                     var resultWithImage = result
                                     if let uiImage = UIImage(data: graph.imageData) {
                                         resultWithImage.capturedImage = uiImage
@@ -47,7 +47,7 @@ struct HistoryView: View {
                                             .fill(Color.gray.opacity(0.3))
                                             .frame(width: 80, height: 80)
                                     }
-                                    
+
                                     VStack(alignment: .leading, spacing: 5) {
                                         if let result = graph.interpretationResult {
                                             Text(result.graphType.rawValue)
@@ -61,7 +61,7 @@ struct HistoryView: View {
                                                 .font(.headline)
                                                 .foregroundColor(.primary)
                                         }
-                                        
+
                                         Text(graph.timestamp, style: .date)
                                             .font(.caption)
                                             .foregroundColor(.gray)
@@ -83,7 +83,7 @@ struct HistoryView: View {
             }
         }
     }
-    
+
     private func deleteGraphs(offsets: IndexSet) {
         withAnimation {
             for index in offsets {

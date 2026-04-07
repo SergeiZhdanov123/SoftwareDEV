@@ -1,15 +1,14 @@
 import Foundation
 import SwiftUI
 
-
 enum AccessibilityMode: String, CaseIterable, Identifiable, Codable {
     case audio = "Audio"
     case visual = "Visual"
     case haptic = "Haptic"
     case combined = "Combined"
-    
+
     var id: String { rawValue }
-    
+
     var icon: String {
         switch self {
         case .audio: return "speaker.wave.3.fill"
@@ -18,7 +17,7 @@ enum AccessibilityMode: String, CaseIterable, Identifiable, Codable {
         case .combined: return "square.stack.3d.up.fill"
         }
     }
-    
+
     var description: String {
         switch self {
         case .audio: return "Voice descriptions of graphs"
@@ -29,14 +28,13 @@ enum AccessibilityMode: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-
 struct SpeechSettings: Equatable, Codable {
-    var rate: Float = 0.5 
-    var pitch: Float = 1.0 
-    var volume: Float = 1.0 
-    var voice: String = "en-US" 
+    var rate: Float = 0.5
+    var pitch: Float = 1.0
+    var volume: Float = 1.0
+    var voice: String = "en-US"
     var autoPlay: Bool = true
-    
+
     var rateDescription: String {
         switch rate {
         case 0.0..<0.3: return "Slow"
@@ -54,7 +52,7 @@ struct VisualSettings: Equatable, Codable {
     var showTrendIcons: Bool = true
     var showConfidenceIndicator: Bool = true
     var animationsEnabled: Bool = true
-    
+
     var dynamicTypeSize: DynamicTypeSize {
         switch fontSize {
         case 16..<20: return .medium
@@ -66,25 +64,24 @@ struct VisualSettings: Equatable, Codable {
         default: return .medium
         }
     }
-    
+
     enum ColorBlindMode: String, CaseIterable, Identifiable, Codable {
         case none = "Standard"
         case protanopia = "Protanopia"
         case deuteranopia = "Deuteranopia"
         case tritanopia = "Tritanopia"
         case monochrome = "Monochrome"
-        
+
         var id: String { rawValue }
     }
 }
 
-
 struct HapticSettings: Equatable, Codable {
-    var intensity: Float = 0.8 
+    var intensity: Float = 0.8
     var enabled: Bool = true
     var patternDuration: Double = 0.5
     var feedbackOnTap: Bool = true
-    
+
     var intensityDescription: String {
         switch intensity {
         case 0.0..<0.3: return "Gentle"
@@ -93,7 +90,6 @@ struct HapticSettings: Equatable, Codable {
         }
     }
 }
-
 
 struct UserPreferences: Equatable, Codable {
     var primaryMode: AccessibilityMode = .combined
@@ -106,41 +102,37 @@ struct UserPreferences: Equatable, Codable {
     var saveHistory: Bool = true
 }
 
-
 struct AccessibleColors {
 
-    static let primary = Color(red: 0.0, green: 0.45, blue: 0.7)     
-    static let secondary = Color(red: 0.9, green: 0.6, blue: 0.0)     
-    static let tertiary = Color(red: 0.0, green: 0.6, blue: 0.5)      
-    static let quaternary = Color(red: 0.8, green: 0.4, blue: 0.0)    
-    
-    // Standard Semantic Colors
+    static let primary = Color(red: 0.0, green: 0.45, blue: 0.7)
+    static let secondary = Color(red: 0.9, green: 0.6, blue: 0.0)
+    static let tertiary = Color(red: 0.0, green: 0.6, blue: 0.5)
+    static let quaternary = Color(red: 0.8, green: 0.4, blue: 0.0)
+
     private static var standardSuccess: Color { Color(red: 0.15, green: 0.6, blue: 0.15) }
     private static var standardWarning: Color { Color(red: 0.95, green: 0.6, blue: 0.1) }
     private static var standardError: Color { Color(red: 0.85, green: 0.2, blue: 0.2) }
-    
-    // Convenience properties for standard mode
+
     static var success: Color { standardSuccess }
     static var warning: Color { standardWarning }
     static var error: Color { standardError }
-    
-    // Convenience functions for specific modes
+
     static func success(mode: VisualSettings.ColorBlindMode) -> Color {
         trendColor(for: .increasing, mode: mode)
     }
-    
+
     static func warning(mode: VisualSettings.ColorBlindMode) -> Color {
         trendColor(for: .fluctuating, mode: mode)
     }
-    
+
     static func error(mode: VisualSettings.ColorBlindMode) -> Color {
         trendColor(for: .decreasing, mode: mode)
     }
-    
+
     static let highContrastBackground = Color.black
     static let highContrastText = Color.white
     static let highContrastAccent = Color.yellow
-    
+
     static func trendColor(for trend: TrendType, mode: VisualSettings.ColorBlindMode = .none) -> Color {
         switch mode {
         case .monochrome:
@@ -160,7 +152,7 @@ struct AccessibleColors {
             }
         }
     }
-    
+
     private static func monochromeTrendColor(for trend: TrendType) -> Color {
         switch trend {
         case .increasing, .exponential: return .white
@@ -168,21 +160,21 @@ struct AccessibleColors {
         default: return .secondary
         }
     }
-    
+
     private static func blueYellowTrendColor(for trend: TrendType) -> Color {
-        // Safe for Protanopia and Deuteranopia
+
         switch trend {
-        case .increasing, .exponential: return Color(red: 0.0, green: 0.27, blue: 0.67) // Deep Blue
-        case .decreasing, .logarithmic: return Color(red: 0.9, green: 0.7, blue: 0.0)  // Golden Yellow
+        case .increasing, .exponential: return Color(red: 0.0, green: 0.27, blue: 0.67)
+        case .decreasing, .logarithmic: return Color(red: 0.9, green: 0.7, blue: 0.0)
         default: return .primary
         }
     }
-    
+
     private static func redCyanTrendColor(for trend: TrendType) -> Color {
-        // Safe for Tritanopia
+
         switch trend {
-        case .increasing, .exponential: return Color(red: 0.0, green: 0.6, blue: 0.6) // Cyan
-        case .decreasing, .logarithmic: return Color(red: 0.8, green: 0.0, blue: 0.0)  // Red
+        case .increasing, .exponential: return Color(red: 0.0, green: 0.6, blue: 0.6)
+        case .decreasing, .logarithmic: return Color(red: 0.8, green: 0.0, blue: 0.0)
         default: return .primary
         }
     }
