@@ -1,6 +1,6 @@
-# StatSense PA TSA States 2026 Submission Team 2098-901
+# StatSense: PA TSA States 2026 Submission Team 2098-901
 
-**What is Statsense?**
+## What is Statsense? 
 
 StatSense is an iOS accessibility application designed to bridge the gap between visual data and non-visual interpretation. By combining Apple's Vision Framework with the DeepSeek API, StatSense translates static graphs, charts, and diagrams into multi-sensory experiences through audio descriptions, haptic feedback, and high-contrast visual modes.
 
